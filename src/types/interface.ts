@@ -1,3 +1,9 @@
+export interface IError {
+    message: string;
+    name?: string;
+    code?: number;
+}
+
 // login interface
 export interface ILoginInput {
     company_name: string;

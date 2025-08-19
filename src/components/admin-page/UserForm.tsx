@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 type FormData = {
@@ -220,15 +219,16 @@ function CompanyDetails({ companyData, shiftData }: CompanyDetailsProps) {
 
       <div className="grid grid-cols-2 gap-3">
         <Field label="Company">
-          <input
+          <select
             className="input"
-            type="number"
-            {...register("employment.company_id", {
-              required: true,
-              valueAsNumber: true,
-            })}
-            placeholder={companyData.company_name}
-          />
+            defaultValue=""
+            {...register("employment.company_id", { required: true, valueAsNumber: true })}
+          >
+            <option value="" disabled>— Select Company —</option>
+              <option value={companyData.company_id}>
+                {companyData.company_name}
+              </option>
+          </select>
         </Field>
 
         <Field label="Employee Type">
@@ -262,21 +262,6 @@ function CompanyDetails({ companyData, shiftData }: CompanyDetailsProps) {
           </select>
         </Field>
 
-        <Field label="Shift">
-          <select
-            className="input"
-            defaultValue=""
-            {...register("employment.shift_id", { valueAsNumber: true })}
-          >
-            <option value="" disabled>— Pilih shift —</option>
-            {shiftData.map((shift: ShiftData) => (
-              <option key={shift.shift_id} value={shift.shift_id}>
-                {`${shift.title} ${shift.opening_time} - ${shift.closing_time} ${shift.shift_id}`}
-              </option>
-            ))}
-          </select>
-        </Field>
-
         <Field label="Joining Date">
           <input
             className="input"
@@ -291,6 +276,21 @@ function CompanyDetails({ companyData, shiftData }: CompanyDetailsProps) {
             type="date"
             {...register("employment.leaving_date")}
           />
+        </Field>
+
+        <Field label="Shift">
+          <select
+            className="input"
+            defaultValue=""
+            {...register("employment.shift_id", { required: true, valueAsNumber: true })}
+          >
+            <option value="" disabled>— Select shift —</option>
+            {shiftData.map((shift: ShiftData) => (
+              <option key={shift.shift_id} value={shift.shift_id}>
+                {`${shift.title} ${shift.opening_time} - ${shift.closing_time} ${shift.shift_id}`}
+              </option>
+            ))}
+          </select>
         </Field>
 
         <Field label="Status">
