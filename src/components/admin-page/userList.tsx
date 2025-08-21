@@ -8,42 +8,14 @@ import {
 } from "../ui/table";
 import Link from "next/link";
 import { Eye } from 'lucide-react';
+import { fetchAllUserCompany } from "@/services/UserAPI";
 
-const UserList = () => {
-  const userList = [
-    {
-      id: 1,
-      name: "Jamal Suemal",
-      address: "Jl. menteng No. 12",
-      email: "jamalsul12@gmail.com",
-      phone_number: "081927189900",
-      is_active: "Active",
-    },
-    {
-      id: 2,
-      name: "Siti Rahmawati",
-      address: "Jl. Melati No. 45",
-      email: "sitirahmawati@gmail.com",
-      phone_number: "082134567890",
-      is_active: "Active",
-    },
-    {
-      id: 3,
-      name: "Andi Prasetyo",
-      address: "Jl. Diponegoro No. 78",
-      email: "andiprasetyo88@gmail.com",
-      phone_number: "081345678912",
-      is_active: "Inactive",
-    },
-    {
-      id: 4,
-      name: "Bunga Lestari",
-      address: "Jl. Kenanga No. 5",
-      email: "bunga.lestari@gmail.com",
-      phone_number: "085612345678",
-      is_active: "Active",
-    },
-  ];
+const UserList = async ({token}: {
+  token: string
+}): Promise<React.JSX.Element> => {
+  const userList = await fetchAllUserCompany(token)
+
+  console.log(userList)
 
   return (
     <Table>
@@ -59,7 +31,7 @@ const UserList = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {userList.map((user, index: number) => (
+        {/* {userList.map((user, index: number) => (
           <TableRow key={index}>
             <TableCell>{index + 1}</TableCell>
             <TableCell>
@@ -71,7 +43,7 @@ const UserList = () => {
             <TableCell>{user.phone_number}</TableCell>
             <TableCell>{user.is_active}</TableCell>
           </TableRow>
-        ))}
+        ))} */}
       </TableBody>
     </Table>
   );

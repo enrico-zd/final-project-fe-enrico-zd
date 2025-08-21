@@ -89,13 +89,19 @@ export interface IUser {
     name: string;
     address: string;
     email: string;
-    gender: string;
     phone_number: string;
-    date_of_birth: Date;
+    date_of_birth: string;
     avatar: string;
+    gender: string;
     username: string;
-    password: string;
     role: Role;
+}
+
+// percobaan
+export interface IUser2 {
+    id: number;
+    email: string;
+    name: string;
 }
 
 
@@ -110,8 +116,10 @@ export interface IUserCompanyDetail {
     joining_date: Date;
     leaving_date: Date;
     shift_id: number;
-    work_space: WorkSpace;
+    workspace: WorkSpace;
     user_status: StatusActive;
+    user: IUser;
+    company: ICompany;
 }
 
 // user list interface

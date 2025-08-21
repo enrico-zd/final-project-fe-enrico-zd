@@ -1,16 +1,63 @@
 "use client"
 import { ILoginInput } from "@/types/interface"
+import { signIn } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 
 export default function LoginForm() {
+    const router = useRouter()
+    // const searchParams = useSearchParams()
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const {register,formState: { errors }, handleSubmit} = useForm<ILoginInput>()
-    const onSubmit: SubmitHandler<ILoginInput> = (data) => console.log(data)
+
+    const onSubmit: SubmitHandler<ILoginInput> = async (data) => {
+        setIsLoading(true)
+        setError("");
+        setSuccess("");
+
+        try{
+            const result = await signIn("credentials", {
+                redirect: false,
+                company_name: data.company_name,
+                username: data.username,
+                password: data.password,
+            })
+
+            if (result?.error) {
+                setError(result.error)
+            } else if (result?.ok) {
+                router.refresh();
+                router.push("/admin/dashboard");
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(error.message);
+            } else {
+                setError("An error occurred. Please try again.");
+            }
+            setIsLoading(false);
+        }
+    }
 
     return (
         <div className="rounded-lg shadow-2xl shadow-amber-800 ring-1 ring-amber-700/50 bg-black items-center p-10">
             <div className="w-[320px] text-lg">
                 <h1 className="text-center mb-4 text-2xl font-semibold text-amber-600">Login</h1>
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+                    {error && (
+                        <div className="bg-red-900/50 p-4 rounded-md border border-red-500">
+                            <p className="text-sm text-red-200">{error}</p>
+                        </div>
+                    )}
+
+                    {success && (
+                        <div className="bg-green-900/50 p-4 rounded-md border border-green-500">
+                            <p className="text-sm text-green-200">{success}</p>
+                        </div>
+                    )}
                     <div className="flex flex-col">
                         <label className="text-white font-semibold" htmlFor="company_name">Company Name</label>
                         <input 
@@ -57,7 +104,7 @@ export default function LoginForm() {
                     </div>
                     
                     <div className="mt-2 py-2 flex justify-center w-full rounded-sm text-white bg-amber-400 hover:bg-amber-500">
-                        <input type="submit" value="Login"/>
+                        {isLoading ? "Loading..." : <input type="submit" value="Login"/>}
                     </div>
                 </form>
             </div>

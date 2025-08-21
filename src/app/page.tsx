@@ -1,8 +1,11 @@
 
 import Login from "./login/page";
 
-export default function Home() {
+export default async function Home() {
+  
   return (
-    <Login />
+    <div>
+      <Login />
+    </div>
   );
 }
