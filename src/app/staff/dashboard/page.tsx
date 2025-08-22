@@ -19,6 +19,7 @@ export default function DashboardStaff() {
       return;
     }
   }, [session, status, router]);
+  
 
   return (
     <div className="pb-2 w-[375px] h-full shadow shadow-amber-200 bg-amber-100">
@@ -27,23 +28,22 @@ export default function DashboardStaff() {
           <div className="flex w-full justify-between gap-2 text-left text-sm">
             <div className="flex gap-2 pl-1">
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage
-                  src="https://upload.wikimedia.org/wikipedia/commons/1/12/230601_Karina_%28aespa%29.jpg"
-                  alt="jimin"
-                />
+                <AvatarImage src={session?.user.avatar} />
                 <AvatarFallback className="rounded-lg">KJ</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">Kim Jimin</span>
+                <span className="truncate font-medium">
+                  {session?.user.name}
+                </span>
                 <span className="text-muted-foreground truncate text-xs">
-                  jimin@gmail.com
+                  {session?.user.email}
                 </span>
               </div>
             </div>
           </div>
         </Link>
       </div>
-      <div>
+      <div className="flex flex-col items-center">
         <ShiftTracker />
         <Overview />
         <FeatureMenu />

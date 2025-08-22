@@ -1,6 +1,7 @@
 "use client";
 import { ILoginInput } from "@/types/interface";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -125,6 +126,12 @@ export default function LoginForm() {
 
           <div className="mt-2 py-2 flex justify-center w-full rounded-sm text-white bg-amber-400 hover:bg-amber-500">
             {isLoading ? "Loading..." : <input type="submit" value="Login" />}
+          </div>
+          <div className="text-white text-md flex flex-col items-center">
+            <p>Don&apos;t have register company?</p>
+            <Link className="text-blue-400" href={"./register"}>
+              register here.
+            </Link>
           </div>
         </form>
       </div>

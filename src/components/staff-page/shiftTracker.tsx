@@ -4,7 +4,7 @@ import RealtimeClock from "./realtimeClock";
 const ShiftTracker = () => {
     
     return (
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col w-[94%] items-center gap-4">
             <div>
                 <RealtimeClock locale="en-US" timeZone="Asia/Jakarta" hour12={false}/>
             </div>
@@ -19,12 +19,12 @@ const ShiftTracker = () => {
                     <p>Check In | Check Out</p>
                 </div>
             </div>
-            <div className="w-[96%]">
+            <div className="w-full">
                 <div className="flex flex-row justify-between">
                     <p>08:00:00</p>
                     <p>16:00:00</p>
                 </div>
-                <div className="bg-amber-400 w-full text-center rounded-lg py-0.5">
+                <div className="bg-amber-400  text-center rounded-lg py-0.5">
                     0 hr 0 min
                 </div>
             </div>
