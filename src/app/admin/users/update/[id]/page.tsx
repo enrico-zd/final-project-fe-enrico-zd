@@ -5,7 +5,7 @@ import UserForm from "@/components/admin-page/UserForm";
 export default async function UpdateUser({
   params,
 }: {
-  params: { id: number };
+  params: Promise<{ id: number }>;
 }) {
   const prevPath = {
     path: "/admin/users",

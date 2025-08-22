@@ -1,10 +1,21 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable jsx-a11y/alt-text */
 "use client";
 import { fetchShift } from "@/services/ShiftAPI";
 import { fetchUserCompanyById } from "@/services/UserAPI";
-import { EmployeeType, IError, IShift, IUser, IUserCompanyDetail, Role, StatusActive, UserType, WorkSpace } from "@/types/interface";
+import {
+  EmployeeType,
+  IError,
+  IShift,
+  IUser,
+  IUserCompanyDetail,
+  Role,
+  StatusActive,
+  UserType,
+  WorkSpace,
+} from "@/types/interface";
 import { format, parseISO } from "date-fns";
 import { useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
@@ -49,54 +60,60 @@ const UserForm = ({
   id?: number | undefined;
   modes: string;
 }) => {
-
   const { data: session, status } = useSession();
   const [dataUsers, setDataUsers] = useState<IUserCompanyDetail>();
-  const [shiftData, setShiftData] = useState<IShift[]>([])
+  const [shiftData, setShiftData] = useState<IShift[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<IError | null>(null);
-  const userId = id === session?.user.user_id || !id ? session?.user.user_id : id
-  
-  const loadData = async (): Promise<void> => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const user = await fetchUserCompanyById(
-        userId,
-        session?.user.accessToken
-      );
-      const shift = await fetchShift(session?.user.accessToken)
-      setDataUsers(user);
-      setShiftData(shift)
-    } catch (err) {
-      setError({
-        message: err instanceof Error ? err.message : "Unknown error occured",
-        name: err instanceof Error ? err.name : undefined,
-        code: err instanceof Error ? 500 : undefined,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  useEffect(() => {
+    const resolvedUserId =
+      id === session?.user.user_id || !id ? session?.user.user_id : id;
+    const accessToken = session?.user.accessToken;
+
+    if (status !== "authenticated" || !resolvedUserId || !accessToken) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const user = await fetchUserCompanyById(resolvedUserId, accessToken);
+        const shift = await fetchShift(accessToken);
+
+        if (!cancelled) {
+          setDataUsers(user);
+          setShiftData(shift);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError({
+            message:
+              err instanceof Error ? err.message : "Unknown error occured",
+            name: err instanceof Error ? err.name : undefined,
+            code: err instanceof Error ? 500 : undefined,
+          });
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status, id, session?.user.user_id, session?.user.accessToken]);
+
+  console.log(error);
 
   const methods = useForm<FormData>();
   const onSubmit = methods.handleSubmit((data) => console.log(data));
   const action =
-    modes === "create"
-      ? "Create"
-      : modes === "edit"
-      ? "Update"
-      : "";
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      loadData();
-    }
-  }, [status]);
-
-  console.log(error);
+    modes === "create" ? "Create" : modes === "edit" ? "Update" : "";
   return (
     <div className="flex flex-col items-center gap-4">
+      {isLoading && <h1>Loading...</h1>}
       <div className="bg-amber-200 w-[96%] px-6 py-4 h-full rounded-sm">
         <FormProvider {...methods}>
           <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 mt-4">
@@ -367,10 +384,7 @@ function CompanyDetails({
                 {`${shift.title} ${format(
                   parseISO(shift.opening_time),
                   "HH:mm:ss"
-                )} - ${format(
-                  parseISO(shift.closing_time),
-                  "HH:mm:ss"
-                )}`}
+                )} - ${format(parseISO(shift.closing_time), "HH:mm:ss")}`}
               </option>
             ))}
           </select>

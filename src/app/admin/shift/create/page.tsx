@@ -18,7 +18,7 @@ export default function CreateShift() {
         />
       </div>
       <div>
-        <ShiftFormCreate/>
+        <ShiftFormCreate modes="create"/>
       </div>
     </div>
     )

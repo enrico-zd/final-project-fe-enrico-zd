@@ -12,36 +12,50 @@ import { fetchAllUserCompany } from "@/services/UserAPI";
 import { IError, IUserCompanyDetail } from "@/types/interface";
 import { useEffect, useState } from "react";
 
-const UserList = ({token, statusAuth}: {
-  token: string | undefined,
-  statusAuth: string,
+const UserList = ({
+  token,
+  statusAuth,
+}: {
+  token: string | undefined;
+  statusAuth: string;
 }) => {
   const [dataUsers, setDataUsers] = useState<IUserCompanyDetail[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<IError | null>(null);
 
-  const loadUsers = async (): Promise<void> => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await fetchAllUserCompany(token);
-      setDataUsers(data);
-    } catch (err) {
-      setError({
-        message: err instanceof Error ? err.message : "Unknown error occured",
-        name: err instanceof Error ? err.name : undefined,
-        code: err instanceof Error ? 500 : undefined,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (statusAuth === "authenticated"){
-      loadUsers();
-    }
-  }, [statusAuth]);
+    if (statusAuth !== "authenticated" || !token) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const data = await fetchAllUserCompany(token);
+
+        if (!cancelled) {
+          setDataUsers(data);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError({
+            message:
+              err instanceof Error ? err.message : "Unknown error occured",
+            name: err instanceof Error ? err.name : undefined,
+            code: err instanceof Error ? 500 : undefined,
+          });
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [statusAuth, token]);
 
   console.log(error);
 

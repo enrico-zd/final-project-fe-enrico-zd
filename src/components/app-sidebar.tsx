@@ -66,29 +66,41 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<IError | null>(null);
 
-  const loadCompany = async (): Promise<void> => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const token = session?.user.accessToken;
-      const data = await fetchCompany(token);
-      setDataCompany(data);
-    } catch (err) {
-      setError({
-        message: err instanceof Error ? err.message : "Unknown error occured",
-        name: err instanceof Error ? err.name : undefined,
-        code: err instanceof Error ? 500 : undefined,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (status === "authenticated") {
-      loadCompany();
-    }
-  }, [status]);
+    const accessToken = session?.user.accessToken;
+
+    if (status !== "authenticated" || !accessToken) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const data = await fetchCompany(accessToken);
+
+        if (!cancelled) {
+          setDataCompany(data);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError({
+            message:
+              err instanceof Error ? err.message : "Unknown error occured",
+            name: err instanceof Error ? err.name : undefined,
+            code: err instanceof Error ? 500 : undefined,
+          });
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status, session?.user.accessToken]);
 
   console.log(error);
   return (
@@ -159,11 +171,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
               {/* sidebar footer */}
               <SidebarFooter>
-                <NavUser 
-                user_id={session?.user.user_id}
-                email={session?.user.email}
-                name={session?.user.name}
-                avatar={session?.user.avatar}
+                <NavUser
+                  user_id={session?.user.user_id}
+                  email={session?.user.email}
+                  name={session?.user.name}
+                  avatar={session?.user.avatar}
                 />
               </SidebarFooter>
             </SidebarMenu>

@@ -9,7 +9,7 @@ import { getServerSession } from "next-auth";
 export default async function AttendanceDetail({
   params,
 }: {
-  params: { id: number };
+  params: Promise<{ id: number }>;
 }) {
   const { id } = await params;
   const session = await getServerSession(authOptions)

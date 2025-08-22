@@ -21,33 +21,44 @@ const ShiftFormUpdate = ({ id, modes }: { id?: number; modes: string }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<IError | null>(null);
 
-  const loadData = async (): Promise<void> => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const user = await fetchUserCompanyById(
-        session?.user.user_id,
-        session?.user.accessToken
-      );
-      const shift = await fetchShiftById(id, session?.user.accessToken);
-      setShiftData(shift);
-      setDataUser(user);
-    } catch (err) {
-      setError({
-        message: err instanceof Error ? err.message : "Unknown error occured",
-        name: err instanceof Error ? err.name : undefined,
-        code: err instanceof Error ? 500 : undefined,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (status === "authenticated") {
-      loadData();
-    }
-  }, [status]);
+    const userId = session?.user.user_id;
+    const accessToken = session?.user.accessToken;
+
+    if (status !== "authenticated" || !userId || !accessToken) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const user = await fetchUserCompanyById(userId, accessToken);
+        const shift = await fetchShiftById(id, accessToken);
+
+        if (!cancelled) {
+          setDataUser(user);
+          setShiftData(shift);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError({
+            message:
+              err instanceof Error ? err.message : "Unknown error occured",
+            name: err instanceof Error ? err.name : undefined,
+            code: err instanceof Error ? 500 : undefined,
+          });
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status, session?.user.user_id, session?.user.accessToken, id]);
 
   console.log(error);
 
@@ -61,6 +72,7 @@ const ShiftFormUpdate = ({ id, modes }: { id?: number; modes: string }) => {
 
   return (
     <div className="flex flex-col items-center gap-4">
+      {isLoading && <h1>Loading...</h1>}
       <div className="bg-amber-200 w-[96%] px-6 py-4 h-full rounded-sm">
         <h1 className="text-2xl text-amber-800">Office Time</h1>
         <form
