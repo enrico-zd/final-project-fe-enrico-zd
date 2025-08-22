@@ -174,9 +174,9 @@ export default function RegisterForm() {
             )}
           </div>
 
-          <div className="text-white text-md flex flex-row justify-center gap-2">
+          <div className="text-white text-md flex flex-col items-center">
             <p>Have registered company? </p>
-            <Link className="text-blue-400" href={"./login"}>Login</Link>
+            <Link className="text-blue-400" href={"./login"}>login here.</Link>
           </div>
         </form>
       </div>

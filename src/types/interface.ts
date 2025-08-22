@@ -59,6 +59,10 @@ export enum AttendanceBy {
   Admin = "ADMIN",
   Self = "SELF"
 }
+export enum Gender { 
+  Male = "MALE",
+  Female = "FEMALE"
+}
 
 export interface IError {
   message: string;
@@ -116,7 +120,7 @@ export interface IUser {
   phone_number: string;
   date_of_birth: string;
   avatar: string;
-  gender: string;
+  gender: Gender;
   username: string;
   password: string;
   role: Role;
