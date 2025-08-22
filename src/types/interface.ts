@@ -1,155 +1,192 @@
-export interface IError {
-    message: string;
-    name?: string;
-    code?: number;
-}
-
-// login interface
-export interface ILoginInput {
-    company_name: string;
-    username: string;
-    password: string;
-}
-
-// register interface
-export interface IRegisterInput {
-    full_name: string;
-    company_name: string;
-    email: string;
-    phone_number: string;
-}
-
-
 // holiday
 export enum Holiday {
-    Sunday = "sunday",
-    Monday = "monday",
-    Tuesday = "tuesday",
-    Wednesday = "wednesday",
-    Thursday = "thursday",
-    Friday = "friday",
-    Saturday = "saturday"
+  Sunday = "sunday",
+  Monday = "monday",
+  Tuesday = "tuesday",
+  Wednesday = "wednesday",
+  Thursday = "thursday",
+  Friday = "friday",
+  Saturday = "saturday",
 }
 
 // status active
 export enum StatusActive {
-    Active = 'active',
-    Inactive = 'inactive'
-};
+  Active = "ACTIVE",
+  Inactive = "INACTIVE",
+}
 
 export enum Role {
-    Admin = "admin",
-    Staff = "staff",
-    Internship = "internship"
+  Admin = "ADMIN",
+  Staff = "STAFF",
+  Internship = "INTERNSHIP",
 }
 
 export enum EmployeeType {
-    Contract = "contract",
-    Permanent = "permanent",
-    Temporary = "temporary"
+  Contract = "CONTRACT",
+  Permanent = "PERMANENT",
+  Temporary = "TEMPORARY",
 }
 
 export enum UserType {
-    Field = "field",
-    NonField = "nonfield"
+  Field = "FIELD",
+  NonField = "NONFIELD",
 }
 
 export enum WorkSpace {
-    Home = "home",
-    Office = "office"
+  Home = "HOME",
+  Office = "OFFICE",
 }
 
 export enum PaidLeave {
-    Yes = "yes",
-    No = "no"
+  Yes = "YES",
+  No = "No",
+}
+
+export enum AttendanceStatus { 
+  Present = "PRESENT", 
+  Late = "LATE", 
+  Absent = "ABSENT", 
+  Leave = "LEAVE" 
+}
+
+export enum StatusApproval { 
+  Pending = "PENDING",
+  Approved = "APPROVED",
+  Rejected = "REJECTED"
+}
+
+export enum AttendanceBy { 
+  Admin = "ADMIN",
+  Self = "SELF"
+}
+
+export interface IError {
+  message: string;
+  name?: string;
+  code?: number;
+}
+
+// login interface
+export interface ILoginInput {
+  company_name: string;
+  username: string;
+  password: string;
+}
+
+// register interface
+export interface IRegisterInput {
+  company_name: string;
+  full_name: string;
+  address: string;
+  email: string;
+  phone_number: string;
+}
+
+export interface IRegisterResponse {
+  access_token: string;
+  user: IUser;
 }
 
 // company interface
 export interface ICompany {
-    company_name: string;
-    company_owner: string;
-    company_address: string;
-    company_email: string;
-    company_phone: string;
-    web_url: string;
-    npwp: string;
-    payroll_date: number;
-    status: StatusActive;
-    general_holiday: Holiday;
-    image_company: string;
+  company_id: number;
+  company_name: string;
+  company_owner: string;
+  company_address: string;
+  company_email: string;
+  company_phone: string;
+  web_url: string;
+  npwp: string;
+  payroll_date: number;
+  status: StatusActive;
+  general_holiday: Holiday;
+  image_company: string;
 }
 
 // user interface
 export interface IUser {
-    user_id: number;
-    nik: string;
-    family_card_number: string;
-    employment_number: string;
-    passport_number: string;
-    name: string;
-    address: string;
-    email: string;
-    phone_number: string;
-    date_of_birth: string;
-    avatar: string;
-    gender: string;
-    username: string;
-    role: Role;
+  user_id: number;
+  nik: string;
+  family_card_number: string;
+  employment_number: string;
+  passport_number: string;
+  name: string;
+  address: string;
+  email: string;
+  phone_number: string;
+  date_of_birth: string;
+  avatar: string;
+  gender: string;
+  username: string;
+  password: string;
+  role: Role;
 }
-
-// percobaan
-export interface IUser2 {
-    id: number;
-    email: string;
-    name: string;
-}
-
-
 
 // user company detail interface
 export interface IUserCompanyDetail {
-    user_company_id: number;
-    company_id: number;
-    user_id: number;
-    employee_type: EmployeeType;
-    user_type: UserType;
-    joining_date: Date;
-    leaving_date: Date;
-    shift_id: number;
-    workspace: WorkSpace;
-    user_status: StatusActive;
-    user: IUser;
-    company: ICompany;
-}
-
-// user list interface
-export interface IUserList {
-    name: string;
-    address: string;
-    email: string;
-    phone_number: string;
-    is_active: StatusActive;
+  user_company_id: number;
+  company_id: number;
+  user_id: number;
+  employee_type: EmployeeType;
+  user_type: UserType;
+  joining_date: string;
+  leaving_date: string;
+  shift_id: number;
+  workspace: WorkSpace;
+  user_status: StatusActive;
+  user: IUser;
+  company: ICompany;
 }
 
 // shift interface
 export interface IShift {
-    company: string;
-    title: string;
-    opening_time: string;
-    closing_time: string;
-    total_employee: number;
-    status: StatusActive;
+  shift_id: number;
+  company_id: number;
+  title: string;
+  opening_time: string;
+  closing_time: string;
+  status: StatusActive;
 }
 
 // leave type interface
-export interface ILeavetype {
-    leave_type_name: string;
-    paid_leave: PaidLeave;
-    leave_allocated_day: number;
+export interface ILeaveType {
+  leave_type_id: number;
+  leave_type_name: string;
+  paid_leave: PaidLeave;
+  leave_allocated_day: number;
+}
+
+export interface ILeaveRequest {
+  leave_request_id: number;
+  type: ILeaveType;
+  from: string;
+  to: string;
+  request_date: string;
+  user: IUser;
+  requested_days: number;
+  reason: string;
+  approved_by: IUser;
+  approved_at: string;
+  admin_remark: string;
+  status: StatusApproval;
 }
 
 export interface ITimeAndDate {
-    locale?: string;
-    timeZone?: string;
-    hour12?: boolean
+  locale?: string;
+  timeZone?: string;
+  hour12?: boolean;
+}
+
+export interface IAttendance {
+  attendance_id: number;
+  attendance_date: string;
+  user: IUser;
+  check_in_at: string;
+  check_out_at: string;
+  attendance_status: AttendanceStatus;
+  attendance_by: AttendanceBy;
+  hours_work_min: number;
+  late_minute: number;
+  overtime_min: number;
+  status: StatusApproval;
 }

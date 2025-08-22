@@ -1,8 +1,12 @@
+"use client"
+
 import NavBread from "@/components/nav-bread";
 import ShiftList from "@/components/admin-page/shiftList";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function Shift() {
+  const { data: session, status } = useSession();
   return (
     <div>
       <div>
@@ -12,10 +16,7 @@ export default function Shift() {
         <div>
           <Link href="./shift/create">Create</Link>
         </div>
-        <div>
-          <Link href="./shift/update">Update</Link>
-        </div>
-        <ShiftList />
+        <ShiftList token={session?.user.accessToken} statusAuth={status}/>
       </div>
     </div>
   );

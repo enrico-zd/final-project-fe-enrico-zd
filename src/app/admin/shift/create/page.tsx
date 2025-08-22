@@ -1,7 +1,7 @@
 "use client";
 
+import ShiftFormCreate from "@/components/admin-page/shiftFormCreate";
 import NavBread from "@/components/nav-bread";
-import ShiftForm from "@/components/admin-page/shiftForm";
 
 export default function CreateShift() {
 
@@ -18,7 +18,7 @@ export default function CreateShift() {
         />
       </div>
       <div>
-        <ShiftForm />
+        <ShiftFormCreate/>
       </div>
     </div>
     )

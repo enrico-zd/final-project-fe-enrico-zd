@@ -1,10 +1,9 @@
-"use client";
 
 import NavBread from "@/components/nav-bread";
 import LeaveTypeList from "@/components/admin-page/leaveTypeList";
 import Link from "next/link";
 
-export default function Users() {
+export default function LeaveType() {
   return (
     <div>
       <div>

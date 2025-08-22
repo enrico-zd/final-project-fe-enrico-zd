@@ -33,7 +33,7 @@ export function middleware(request: NextRequest){
         isAuthenticated &&
         path === "/login"
     ) {
-        return NextResponse.redirect(new URL("/admin/dashboard", request.url))
+        return NextResponse.redirect(new URL("/staff/dashboard", request.url))
     }
 
     // For demonstration purposes, log authentication status

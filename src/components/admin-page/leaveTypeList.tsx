@@ -8,30 +8,16 @@ import {
   TableRow,
 } from "../ui/table";
 import { Delete, SquarePen } from "lucide-react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { fetchLeaveType } from "@/services/LeaveTypeApi";
 
-const LeaveTypeList = () => {
-  const leaveTypeList = [
-    {
-      leave_type_id: 1,
-      leave_type_name: "Annual Leave",
-      paid_leave: "Yes",
-      leave_allocated_day: 12,
-    },
-    {
-      leave_type_id: 2,
-      leave_type_name: "Sick Leave",
-      paid_leave: "Yes",
-      leave_allocated_day: 8,
-    },
-    {
-      leave_type_id: 3,
-      leave_type_name: "Unpaid Leave",
-      paid_leave: "No",
-      leave_allocated_day: 0,
-    },
-  ];
+const LeaveTypeList = async () => {
+  const session = await getServerSession(authOptions)
+  const leaveTypeList = await fetchLeaveType(session?.user.accessToken)
+
   return (
-    <Table>
+    <Table className="text-center [&_th]:text-center">
       <TableHeader>
         <TableRow>
           <TableHead>#</TableHead>
@@ -48,7 +34,7 @@ const LeaveTypeList = () => {
             <TableCell>{leaveType.leave_type_name}</TableCell>
             <TableCell>{leaveType.paid_leave}</TableCell>
             <TableCell>{leaveType.leave_allocated_day}</TableCell>
-            <TableCell className="flex flex-row gap-2">
+            <TableCell className="flex flex-row justify-center gap-2">
               <div>
                 <Link href="./leave_type/edit"><SquarePen /></Link>
               </div>

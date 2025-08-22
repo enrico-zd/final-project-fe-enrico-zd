@@ -1,17 +1,22 @@
-"use client";
 
 import NavBread from "@/components/nav-bread";
 import AttendanceList from "@/components/admin-page/attendanceList";
-// import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { fetchUserCompanyById } from "@/services/UserAPI";
 
-export default function Attendance() {
+export default async function Attendance() {
+  const session = await getServerSession(authOptions)
+
+  const users = await fetchUserCompanyById(session?.user.user_id, session?.user.accessToken)
+  
   return (
     <div>
       <div>
         <NavBread currentPage="Employee Attendance List" />
       </div>
       <div>
-        <AttendanceList />
+        <AttendanceList companyId={users.company_id} token={session?.user.accessToken}/>
       </div>
     </div>
   );

@@ -5,21 +5,18 @@ import UserForm from "@/components/admin-page/UserForm";
 
 export default function CreateUser() {
 
-    const prevPath = {
-        path: "./",
-        name: "User Section"
-    }
-    return (
-        <div>
+  const prevPath = {
+    path: "./",
+    name: "User Section",
+  };
+  return (
+    <div>
       <div>
-        <NavBread 
-        currentPage="Create User" 
-        prevPath={prevPath}
-        />
+        <NavBread currentPage="Create User" prevPath={prevPath} />
       </div>
       <div>
-        <UserForm />
+        <UserForm modes="create" />
       </div>
     </div>
-    )
+  );
 }

@@ -16,7 +16,7 @@ const EditProfile = () => {
   const onSubmit: SubmitHandler<IUser> = (data) => console.log(data);
 
   return (
-    <div>
+    <div className="w-[375px] h-screen shadow shadow-amber-200 bg-amber-100">
       <div className="flex flex-row gap-2 m-2 items-center">
         <div>
           <Link href={"./"}>

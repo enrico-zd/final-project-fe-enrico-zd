@@ -1,14 +1,18 @@
 "use client";
 import NavBread from "@/components/nav-bread"
-import { ICompany } from "@/types/interface"
+import { ICompany, StatusActive } from "@/types/interface"
 import { SubmitHandler, useForm } from "react-hook-form"
 
-export default function CompanyProfile() {
+export default function CompanyProfile({
+  companyData
+}: {
+  companyData: ICompany | null;
+}) {
   const { register, handleSubmit } = useForm<ICompany>();
   const onSubmit: SubmitHandler<ICompany> = (data) => console.log(data);
 
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-
+  console.log(companyData?.company_name)
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="self-start">
@@ -28,7 +32,7 @@ export default function CompanyProfile() {
               {...register("company_name", { required: true })}
               type="text"
               id="company_name"
-              defaultValue={"Sejahtera Minjeoung"}
+              defaultValue={companyData?.company_name}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -40,6 +44,7 @@ export default function CompanyProfile() {
               {...register("company_owner", { required: true })}
               type="text"
               id="company_owner"
+              defaultValue={companyData?.company_owner}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -51,6 +56,7 @@ export default function CompanyProfile() {
               {...register("company_address", { required: true })}
               type="text"
               id="address"
+              defaultValue={companyData?.company_address}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -62,6 +68,7 @@ export default function CompanyProfile() {
               {...register("company_email", { required: true })}
               type="email"
               id="email"
+              defaultValue={companyData?.company_email}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -73,6 +80,7 @@ export default function CompanyProfile() {
               {...register("company_phone", { required: true })}
               type="text"
               id="phone_number"
+              defaultValue={companyData?.company_phone}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -84,6 +92,7 @@ export default function CompanyProfile() {
               {...register("web_url", { required: false })}
               type="text"
               id="web_url"
+              defaultValue={companyData?.web_url}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -95,6 +104,7 @@ export default function CompanyProfile() {
               {...register("npwp", { required: false })}
               type="text"
               id="npwp"
+              defaultValue={companyData?.npwp}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -106,6 +116,7 @@ export default function CompanyProfile() {
               {...register("payroll_date", { required: true, min: 1, max: 31 })}
               type="number"
               id="payroll_date"
+              defaultValue={companyData?.payroll_date}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -131,13 +142,14 @@ export default function CompanyProfile() {
               {...register("status", { required: true })}
               name="status"
               id="status"
+              defaultValue={companyData?.status}
               className="bg-amber-50 p-1 rounded-sm"
             >
               <option value="" disabled>
                 Select Status
               </option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+              <option value={StatusActive.Active}>Active</option>
+              <option value={StatusActive.Inactive}>Inactive</option>
             </select>
           </div>
           <div className="flex flex-col gap-2">
@@ -145,7 +157,7 @@ export default function CompanyProfile() {
               Upload Logo
             </label>
             <input
-              {...register("image_company", { required: false })}
+              {...register("image_company")}
               type="file"
               className="bg-amber-50 p-1 rounded-sm"
             />

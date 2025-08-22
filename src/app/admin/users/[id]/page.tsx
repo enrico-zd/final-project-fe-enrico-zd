@@ -1,7 +1,9 @@
 import NavBread from "@/components/nav-bread";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { authOptions } from "@/lib/auth";
 import { fetchUserCompanyById } from "@/services/UserAPI";
 import { parseISO, format } from "date-fns";
+import { getServerSession } from "next-auth";
 
 export default async function UserDetail({
   params,
@@ -14,7 +16,8 @@ export default async function UserDetail({
   };
 
   const { id } = await params;
-  const data = await fetchUserCompanyById(id);
+  const session = await getServerSession(authOptions)
+  const data = await fetchUserCompanyById(id, session?.user.accessToken);
 
   const dateBirth = format(parseISO(data.user.date_of_birth), "yyyy-MM-dd");
 

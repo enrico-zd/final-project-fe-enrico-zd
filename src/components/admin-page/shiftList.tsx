@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -6,53 +9,78 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { IError, IShift } from "@/types/interface";
+import { fetchShift } from "@/services/ShiftAPI";
+import { format, parseISO } from "date-fns";
+import Link from "next/link";
+import { SquarePen } from "lucide-react";
 
-const ShiftList = () => {
-  const shiftList = [
-  {
-    "shift_id": 1,
-    "company": "Coba Company",
-    "title": "Morning Shift",
-    "opening_time": "08:00:00",
-    "closing_time": "16:00:00",
-    "total_employee": 15,
-    "status": "Active"
-  },
-  {
-    "shift_id": 2,
-    "company": "Coba Company",
-    "title": "Evening Shift",
-    "opening_time": "16:00:00",
-    "closing_time": "00:00:00",
-    "total_employee": 10,
-    "status": "Active"
-  }
-]
-;
+const ShiftList = ({
+  token,
+  statusAuth,
+}: {
+  token: string | undefined;
+  statusAuth: string;
+}) => {
+  const [shiftData, setShiftData] = useState<IShift[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<IError | null>(null);
 
+  const loadShift = async (): Promise<void> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const shift = await fetchShift(token);
+      setShiftData(shift);
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (statusAuth === "authenticated") {
+      loadShift();
+    }
+  }, [statusAuth]);
+
+  console.log(error);
   return (
-    <Table>
+    <Table className="[&_th]:text-center text-center">
       <TableHeader>
         <TableRow>
           <TableHead>No</TableHead>
-          <TableHead>Company</TableHead>
           <TableHead>Title</TableHead>
           <TableHead>Opening Time</TableHead>
           <TableHead>Closing Time</TableHead>
-          <TableHead>Total Employee</TableHead>
           <TableHead>Status</TableHead>
+          <TableHead>Action</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {shiftList.map((shift, index: number) => (
+        {shiftData.map((shift, index: number) => (
           <TableRow key={index}>
             <TableCell>{index + 1}</TableCell>
-            <TableCell>{shift.company}</TableCell>
             <TableCell>{shift.title}</TableCell>
-            <TableCell>{shift.opening_time}</TableCell>
-            <TableCell>{shift.closing_time}</TableCell>
-            <TableCell>{shift.total_employee}</TableCell>
+            <TableCell>
+              {format(parseISO(shift.opening_time), "HH:mm:ss")}
+            </TableCell>
+            <TableCell>
+              {format(parseISO(shift.closing_time), "HH:mm:ss")}
+            </TableCell>
             <TableCell>{shift.status}</TableCell>
+            <TableCell className="flex justify-center">
+              <div>
+                <Link href={`./shift/update/${shift.shift_id}`}>
+                  <SquarePen />
+                </Link>
+              </div>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>

@@ -1,6 +1,11 @@
 "use client";
-
+import { fetchShift } from "@/services/ShiftAPI";
+import { fetchUserCompanyById } from "@/services/UserAPI";
+import { EmployeeType, IError, IShift, IUser, IUserCompanyDetail, Role, StatusActive, UserType, WorkSpace } from "@/types/interface";
+import { format, parseISO } from "date-fns";
+import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 type FormData = {
@@ -31,75 +36,76 @@ type FormData = {
   };
 };
 
-type CompanyData = {
-  company_id: number;
-  company_name: string;
-};
-
 type CompanyDetailsProps = {
-  companyData: CompanyData;
-  shiftData: ShiftData[];
+  userCompanyDetail?: IUserCompanyDetail | undefined;
+  shiftData?: IShift[] | undefined;
+  modes?: string;
 };
 
-type ShiftData = {
-  shift_id: number;
-  company_id: number;
-  title: string;
-  opening_time: string;
-  closing_time: string;
-  status: string;
-};
+const UserForm = ({
+  id,
+  modes,
+}: {
+  id?: number | undefined;
+  modes: string;
+}) => {
 
-const UserForm = () => {
+  const { data: session, status } = useSession();
+  const [dataUsers, setDataUsers] = useState<IUserCompanyDetail>();
+  const [shiftData, setShiftData] = useState<IShift[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<IError | null>(null);
+  const userId = id === session?.user.user_id || !id ? session?.user.user_id : id
+  
+  const loadData = async (): Promise<void> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const user = await fetchUserCompanyById(
+        userId,
+        session?.user.accessToken
+      );
+      const shift = await fetchShift(session?.user.accessToken)
+      setDataUsers(user);
+      setShiftData(shift)
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const methods = useForm<FormData>();
   const onSubmit = methods.handleSubmit((data) => console.log(data));
-  const pathName = usePathname();
   const action =
-    pathName === "/admin/users/create"
+    modes === "create"
       ? "Create"
-      : pathName === "/admin/users/update"
+      : modes === "edit"
       ? "Update"
       : "";
 
-  const companyData: CompanyData = {
-    company_id: 1,
-    company_name: "Salut Company",
-  };
+  useEffect(() => {
+    if (status === "authenticated") {
+      loadData();
+    }
+  }, [status]);
 
-  const shiftData: ShiftData[] = [
-    {
-      shift_id: 2,
-      company_id: 1,
-      title: "Shift Pagi",
-      opening_time: "08:00:00",
-      closing_time: "16:00:00",
-      status: "ACTIVE",
-    },
-    {
-      shift_id: 3,
-      company_id: 2,
-      title: "Shift Malam",
-      opening_time: "16:00:00",
-      closing_time: "21:00:00",
-      status: "ACTIVE",
-    },
-    {
-      shift_id: 4,
-      company_id: 1,
-      title: "Shift Begadang",
-      opening_time: "21:00:00",
-      closing_time: "06:00:00",
-      status: "ACTIVE",
-    },
-  ];
-
+  console.log(error);
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="bg-amber-200 w-[96%] px-6 py-4 h-full rounded-sm">
         <FormProvider {...methods}>
           <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 mt-4">
-            <PersonalDetails />
-            <CompanyDetails companyData={companyData} shiftData={shiftData} />
+            <PersonalDetails userData={dataUsers?.user} modes={modes} />
+            <CompanyDetails
+              userCompanyDetail={dataUsers}
+              shiftData={shiftData}
+              modes={modes}
+            />
             <button type="submit" className="btn">
               {action} User
             </button>
@@ -111,8 +117,15 @@ const UserForm = () => {
 };
 
 /* ---------------- Personal Details ---------------- */
-function PersonalDetails() {
+function PersonalDetails({
+  userData,
+  modes,
+}: {
+  userData?: IUser | undefined;
+  modes?: string;
+}) {
   const { register, setValue } = useFormContext<FormData>();
+  if (!userData) return;
 
   return (
     <section className="rounded-md bg-amber-100 p-4">
@@ -123,83 +136,111 @@ function PersonalDetails() {
       <div className="grid grid-cols-2 gap-3">
         <Field label="NIK">
           <input
+            defaultValue={modes === "edit" ? userData.nik : ""}
             className="input"
-            {...register("user.nik", { required: true })}
+            {...register("user.nik")}
           />
         </Field>
         <Field label="Family Card Number">
-          <input className="input" {...register("user.family_card_number")} />
+          <input
+            defaultValue={modes === "edit" ? userData.family_card_number : ""}
+            className="input"
+            {...register("user.family_card_number")}
+          />
         </Field>
 
         <Field label="Employment Number">
-          <input className="input" {...register("user.employment_number")} />
+          <input
+            defaultValue={modes === "edit" ? userData.employment_number : ""}
+            className="input"
+            {...register("user.employment_number")}
+          />
         </Field>
         <Field label="Passport Number">
-          <input className="input" {...register("user.passport_number")} />
+          <input
+            defaultValue={modes === "edit" ? userData.passport_number : ""}
+            className="input"
+            {...register("user.passport_number")}
+          />
         </Field>
 
         <Field label="Name">
           <input
+            defaultValue={modes === "edit" ? userData.name : ""}
             className="input"
             {...register("user.name", { required: true })}
           />
         </Field>
         <Field label="Address">
-          <input className="input" {...register("user.address")} />
+          <input
+            defaultValue={modes === "edit" ? userData.address : ""}
+            className="input"
+            {...register("user.address")}
+          />
         </Field>
 
         <Field label="Email">
           <input
+            defaultValue={modes === "edit" ? userData.email : ""}
             className="input"
             type="email"
             {...register("user.email", { required: true })}
           />
         </Field>
         <Field label="Phone Number">
-          <input className="input" {...register("user.phone_number")} />
+          <input
+            defaultValue={modes === "edit" ? userData.phone_number : ""}
+            className="input"
+            {...register("user.phone_number")}
+          />
         </Field>
 
         <Field label="Date of Birth">
           <input
+            defaultValue={
+              modes === "edit"
+                ? format(parseISO(userData.date_of_birth), "yyyy-MM-dd")
+                : ""
+            }
             className="input"
             type="date"
             {...register("user.date_of_birth", { valueAsDate: true })}
           />
         </Field>
 
+        <Field label="Username">
+          <input
+            defaultValue={modes === "edit" ? userData.username : ""}
+            className="input"
+            {...register("user.username", { required: true })}
+          />
+        </Field>
+
         <Field label="Avatar (file name only)">
           <input
             className="input"
+            // defaultValue={modes === "edit" ? userd : ""}
             type="file"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) setValue("user.avatar", file.name);
             }}
           />
-        </Field>
-
-        <Field label="Username">
-          <input
-            className="input"
-            {...register("user.username", { required: true })}
-          />
-        </Field>
-        <Field label="Password">
-          <input
-            className="input"
-            type="password"
-            {...register("user.password", { required: true })}
-          />
+          <img src={userData.avatar} className="w-50 h-auto" />
         </Field>
 
         <Field label="Role">
           <select
+            defaultValue=""
             className="input"
             {...register("user.role", { required: true })}
           >
-            <option value="Admin">Admin</option>
-            <option value="staff">staff</option>
-            <option value="internship">internship</option>
+            <option value="" disabled>
+              — Select Role —
+            </option>
+            <option value={Role.Admin}>Admin</option>
+            <option value={Role.Staff}>staff</option>
+            <option value={Role.Internship}>internship</option>
           </select>
         </Field>
       </div>
@@ -208,8 +249,13 @@ function PersonalDetails() {
 }
 
 /* ---------------- Company Details ---------------- */
-function CompanyDetails({ companyData, shiftData }: CompanyDetailsProps) {
+function CompanyDetails({
+  userCompanyDetail,
+  shiftData,
+  modes,
+}: CompanyDetailsProps) {
   const { register } = useFormContext<FormData>();
+  if (!userCompanyDetail) return;
 
   return (
     <section className="rounded-md bg-amber-100 p-4">
@@ -221,49 +267,67 @@ function CompanyDetails({ companyData, shiftData }: CompanyDetailsProps) {
         <Field label="Company">
           <select
             className="input"
-            defaultValue=""
-            {...register("employment.company_id", { required: true, valueAsNumber: true })}
+            defaultValue={""}
+            {...register("employment.company_id", {
+              required: true,
+              valueAsNumber: true,
+            })}
           >
-            <option value="" disabled>— Select Company —</option>
-              <option value={companyData.company_id}>
-                {companyData.company_name}
-              </option>
+            <option value="" disabled>
+              — Select Company —
+            </option>
+            <option value={userCompanyDetail.company_id}>
+              {userCompanyDetail.company.company_name}
+            </option>
           </select>
         </Field>
 
         <Field label="Employee Type">
           <select
+            defaultValue={
+              modes === "edit" ? userCompanyDetail.employee_type : ""
+            }
             className="input"
             {...register("employment.employee_type", { required: true })}
           >
-            <option value="Permanent">Permanent</option>
-            <option value="Contract">Contract</option>
-            <option value="Temporary">Temporary</option>
+            <option value={EmployeeType.Permanent}>Permanent</option>
+            <option value={EmployeeType.Contract}>Contract</option>
+            <option value={EmployeeType.Temporary}>Temporary</option>
           </select>
         </Field>
 
         <Field label="User Type">
           <select
+            defaultValue={modes === "edit" ? userCompanyDetail.user_type : ""}
             className="input"
             {...register("employment.user_type", { required: true })}
           >
-            <option value="Field">Field</option>
-            <option value="Nonfiled">Nonfiled</option>
+            <option value={UserType.Field}>Field</option>
+            <option value={UserType.NonField}>Nonfiled</option>
           </select>
         </Field>
 
         <Field label="Workspace">
           <select
+            defaultValue={modes === "edit" ? userCompanyDetail.workspace : ""}
             className="input"
             {...register("employment.workspace", { required: true })}
           >
-            <option value="Office">Office</option>
-            <option value="Home">Home</option>
+            <option value={WorkSpace.Office}>Office</option>
+            <option value={WorkSpace.Home}>Home</option>
           </select>
         </Field>
 
         <Field label="Joining Date">
           <input
+            defaultValue={
+              modes === "edit" && userCompanyDetail.joining_date !== null
+                ? format(
+                    parseISO(userCompanyDetail?.joining_date),
+                    "yyyy-MM-dd"
+                  )
+                : ""
+            }
             className="input"
             type="date"
             {...register("employment.joining_date", { required: true })}
@@ -272,6 +336,14 @@ function CompanyDetails({ companyData, shiftData }: CompanyDetailsProps) {
 
         <Field label="Leaving Date (optional)">
           <input
+            defaultValue={
+              modes === "edit" && userCompanyDetail.leaving_date !== null
+                ? format(
+                    parseISO(userCompanyDetail?.leaving_date),
+                    "yyyy-MM-dd"
+                  )
+                : ""
+            }
             className="input"
             type="date"
             {...register("employment.leaving_date")}
@@ -282,12 +354,23 @@ function CompanyDetails({ companyData, shiftData }: CompanyDetailsProps) {
           <select
             className="input"
             defaultValue=""
-            {...register("employment.shift_id", { required: true, valueAsNumber: true })}
+            {...register("employment.shift_id", {
+              required: true,
+              valueAsNumber: true,
+            })}
           >
-            <option value="" disabled>— Select shift —</option>
-            {shiftData.map((shift: ShiftData) => (
+            <option value="" disabled>
+              — Select shift —
+            </option>
+            {shiftData?.map((shift: IShift) => (
               <option key={shift.shift_id} value={shift.shift_id}>
-                {`${shift.title} ${shift.opening_time} - ${shift.closing_time} ${shift.shift_id}`}
+                {`${shift.title} ${format(
+                  parseISO(shift.opening_time),
+                  "HH:mm:ss"
+                )} - ${format(
+                  parseISO(shift.closing_time),
+                  "HH:mm:ss"
+                )}`}
               </option>
             ))}
           </select>
@@ -298,8 +381,8 @@ function CompanyDetails({ companyData, shiftData }: CompanyDetailsProps) {
             className="input"
             {...register("employment.user_status", { required: true })}
           >
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
+            <option value={StatusActive.Active}>Active</option>
+            <option value={StatusActive.Inactive}>Inactive</option>
           </select>
         </Field>
       </div>

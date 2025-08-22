@@ -1,21 +1,53 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IShift } from "@/types/interface";
-import { useState } from "react";
+import {
+  IError,
+  IShift,
+  IUserCompanyDetail,
+  StatusActive,
+} from "@/types/interface";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { fetchUserCompanyById } from "@/services/UserAPI";
 
-const ShiftForm = () => {
-  const pathName = usePathname();
+const ShiftFormCreate = ({ modes }: { modes: string }) => {
+  const { data: session, status } = useSession();
+
+  const [dataUser, setDataUser] = useState<IUserCompanyDetail | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<IError | null>(null);
+
+  const loadUserDetail = async (): Promise<void> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const user = await fetchUserCompanyById(
+        session?.user.user_id,
+        session?.user.accessToken
+      );
+      setDataUser(user);
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      loadUserDetail();
+    }
+  }, [status]);
+
+  console.log(error);
+
   const action =
-    pathName === "/admin/shift/create"
-      ? "Create"
-      : pathName === "/admin/shift/update"
-      ? "Update"
-      : "";
-
-  const [timeOpening, setTimeOpening] = useState("09:00");
-  const [timeClosing, setTimeClosing] = useState("17:00");
+    modes === "create" ? "Create" : modes === "update" ? "Update" : "";
 
   const { register, handleSubmit } = useForm<IShift>();
   const onSubmit: SubmitHandler<IShift> = (data) => console.log(data);
@@ -32,12 +64,21 @@ const ShiftForm = () => {
             <label htmlFor="company" className="text-amber-800 text-lg">
               Company Name
             </label>
-            <input
-              {...register("company", { required: true })}
-              type="text"
-              id="company"
+            <select
               className="bg-amber-50 p-1 rounded-sm"
-            />
+              defaultValue={""}
+              {...register("company_id", {
+                required: true,
+                valueAsNumber: true,
+              })}
+            >
+              <option value="" disabled>
+                — Select Company —
+              </option>
+              <option value={dataUser?.company_id}>
+                {dataUser?.company.company_name}
+              </option>
+            </select>
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="title" className="text-amber-800 text-lg">
@@ -57,10 +98,8 @@ const ShiftForm = () => {
             <input
               {...register("opening_time", { required: true })}
               type="time"
-              value={timeOpening}
               id="opening_time"
               className="bg-amber-50 p-1 rounded-sm"
-              onChange={(e) => setTimeOpening(e.target.value)}
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -70,10 +109,8 @@ const ShiftForm = () => {
             <input
               {...register("closing_time", { required: true })}
               type="time"
-              value={timeClosing}
               id="closing_time"
               className="bg-amber-50 p-1 rounded-sm"
-              onChange={(e) => setTimeClosing(e.target.value)}
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -89,8 +126,8 @@ const ShiftForm = () => {
               <option value="" disabled>
                 Select Status
               </option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+              <option value={StatusActive.Active}>Active</option>
+              <option value={StatusActive.Inactive}>Inactive</option>
             </select>
           </div>
           <div className="mt-2 py-2 col-span-2 justify-self-center flex justify-center w-[200px] rounded-sm text-white bg-amber-400 hover:bg-amber-500">
@@ -102,4 +139,4 @@ const ShiftForm = () => {
   );
 };
 
-export default ShiftForm;
+export default ShiftFormCreate;

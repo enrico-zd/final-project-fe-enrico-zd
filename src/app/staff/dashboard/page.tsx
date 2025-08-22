@@ -1,13 +1,27 @@
+"use client";
 import FeatureMenu from "@/components/staff-page/featureMenu";
 import Overview from "@/components/staff-page/overview";
 import ShiftTracker from "@/components/staff-page/shiftTracker";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function DashboardStaff() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role === "ADMIN") {
+      router.replace("/admin/dashboard");
+      return;
+    }
+  }, [session, status, router]);
+
   return (
-    <div className="mb-4">
+    <div className="pb-2 w-[375px] h-full shadow shadow-amber-200 bg-amber-100">
       <div className="m-2">
         <Link href={"./profile"}>
           <div className="flex w-full justify-between gap-2 text-left text-sm">
@@ -35,7 +49,10 @@ export default function DashboardStaff() {
         <FeatureMenu />
       </div>
       <div className="mt-4 flex justify-center">
-        <button className="flex flex-col items-center">
+        <button
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className="flex flex-col items-center"
+        >
           <LogOut />
           <p className="text-sm">Log Out</p>
         </button>

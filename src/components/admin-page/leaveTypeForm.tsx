@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { ILeavetype, PaidLeave } from "@/types/interface";
+import { ILeaveType, PaidLeave } from "@/types/interface";
 import { useState } from "react";
 
 const LeaveTypeForm = () => {
@@ -16,8 +16,8 @@ const LeaveTypeForm = () => {
       ? "Edit"
       : "";
 
-  const { register, handleSubmit } = useForm<ILeavetype>();
-  const onSubmit: SubmitHandler<ILeavetype> = (data) => console.log(data);
+  const { register, handleSubmit } = useForm<ILeaveType>();
+  const onSubmit: SubmitHandler<ILeaveType> = (data) => console.log(data);
 
   return (
     <div className="flex flex-col items-center gap-4">

@@ -1,3 +1,4 @@
+import { getServerSession } from "next-auth";
 import {
   Table,
   TableBody,
@@ -6,61 +7,17 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { authOptions } from "@/lib/auth";
+import { fetchLeaveRequest } from "@/services/LeaveRequest";
 
-const LeaveList = () => {
-  const leaveList = [
-  {
-    "leave_request_id": 1,
-    "leave_type": "cuti",
-    "user_id": 5,
-    "status": "PENDING",
-    "reason": "Cuti tahunan untuk liburan keluarga",
-    "admin_remark": "Disetujui, pastikan serah terima pekerjaan",
-    "proof_image": "proofs/leave_1.jpg",
-    "from": "2025-08-20 00:00:00",
-    "to": "2025-08-22 00:00:00",
-    "request_date": "2025-08-10 09:15:00",
-    "request_by": "Self",
-    "requested_days": 3,
-    "approve_by": "Admin HR",
-    "approve_date": "2025-08-12 14:30:00"
-  },
-  {
-    "leave_request_id": 2,
-    "leave_type": "Sakit",
-    "user_id": 8,
-    "status": "APPROVED",
-    "reason": "Sakit demam tinggi",
-    "admin_remark": "Disetujui, istirahat yang cukup",
-    "proof_image": "proofs/medical_certificate_2.png",
-    "from": "2025-08-13 00:00:00",
-    "to": "2025-08-14 00:00:00",
-    "request_date": "2025-08-12 08:00:00",
-    "request_by": "Self",
-    "requested_days": 2,
-    "approve_by": "Manager",
-    "approve_date": "2025-08-12 10:45:00"
-  },
-  {
-    "leave_request_id": 3,
-    "leave_type": "Izin",
-    "user_id": 3,
-    "status": "REJECTED",
-    "reason": "Menghadiri pernikahan saudara",
-    "admin_remark": "Disetujui dengan syarat pekerjaan selesai lebih awal",
-    "proof_image": "proofs/wedding_invitation_3.jpg",
-    "from": "2025-09-05 00:00:00",
-    "to": "2025-09-06 00:00:00",
-    "request_date": "2025-08-25 16:20:00",
-    "request_by": "Self",
-    "requested_days": 2,
-    "approve_by": "Supervisor",
-    "approve_date": "2025-08-26 09:00:00"
-  }
-];
+const LeaveList = async () => {
+  const session = await getServerSession(authOptions)
 
+  const leaveList = await fetchLeaveRequest(session?.user.accessToken)
+
+  console.log(leaveList)
   return (
-    <Table>
+    <Table className="text-center [&_th]:text-center">
       <TableHeader>
         <TableRow>
           <TableHead>#</TableHead>
@@ -80,15 +37,15 @@ const LeaveList = () => {
         {leaveList.map((leave, index: number) => (
           <TableRow key={index}>
             <TableCell>{index + 1}</TableCell>
-            <TableCell>{leave.leave_type}</TableCell>
-            <TableCell>{leave.from}</TableCell>
-            <TableCell>{leave.to}</TableCell>
-            <TableCell>{leave.request_date}</TableCell>
-            <TableCell>{leave.request_by}</TableCell>
+            <TableCell>{leave.type.leave_type_name}</TableCell>
+            <TableCell>{formatDate(leave.from)}</TableCell>
+            <TableCell>{formatDate(leave.to)}</TableCell>
+            <TableCell>{formatRequestDate(leave.request_date)}</TableCell>
+            <TableCell>{leave.user.name}</TableCell>
             <TableCell>{leave.requested_days}</TableCell>
             <TableCell>{leave.reason}</TableCell>
-            <TableCell>{leave.approve_by}</TableCell>
-            <TableCell>{leave.approve_date}</TableCell>
+            <TableCell className="whitespace-pre-line">{leave.approved_by === null ? "-" : `${leave.user.name}\n(${leave.user.role})`}</TableCell>
+            <TableCell>{leave.approved_at === null ? "-" : leave.approved_at}</TableCell>
             <TableCell>{leave.status}</TableCell>
           </TableRow>
         ))}
@@ -96,5 +53,23 @@ const LeaveList = () => {
     </Table>
   );
 };
+
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+  });
+
+}
+
+function formatRequestDate(dateStr: string) {
+const date = new Date(dateStr);
+return date.toLocaleDateString("en-GB", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+});
+}
 
 export default LeaveList;

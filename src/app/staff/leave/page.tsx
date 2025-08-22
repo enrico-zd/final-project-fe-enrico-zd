@@ -1,10 +1,23 @@
+"use client"
 import LeaveTypeCard from "@/components/staff-page/leaveTypeCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import LeaveActivity from "@/components/staff-page/leaveActivity";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function StaffLeave() {
+  const { data: session, status } = useSession();
+    const router = useRouter();
+  
+    useEffect(() => {
+      if (status === "authenticated" && session?.user?.role === "ADMIN") {
+        router.replace("/admin/dashboard");
+        return;
+      }
+    }, [session, status, router]);
   return (
     <div>
       <div className="m-2 flex flex-row justify-between">

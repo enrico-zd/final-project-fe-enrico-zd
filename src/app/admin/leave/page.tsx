@@ -9,7 +9,7 @@ export default function Leave() {
         <NavBread currentPage="Leave Request List" />
       </div>
       <div>
-        <Link href={"./leave/leave_type"}>Leave type</Link>
+        <Link href={"/admin/leave/leave_type"}>Leave type</Link>
       </div>
       <div>
         <LeaveList />

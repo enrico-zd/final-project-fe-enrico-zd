@@ -2,9 +2,11 @@
 import CompanyProfile from "@/components/admin-page/companyProfile";
 import { fetchCompany } from "@/services/CompanyApi";
 import { ICompany, IError } from "@/types/interface";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 export default function CompanyAdmin() {
+  const { data: session, status } = useSession();
   const [dataCompany, setDataCompany] = useState<ICompany | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<IError | null>(null);
@@ -13,7 +15,7 @@ export default function CompanyAdmin() {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await fetchCompany();
+      const data = await fetchCompany(session?.user.accessToken);
       setDataCompany(data);
     } catch (err) {
       setError({
@@ -24,16 +26,17 @@ export default function CompanyAdmin() {
     } finally {
       setIsLoading(false);
     }
-
   };
 
   useEffect(() => {
-    loadCompany();
-  }, []);
+    if (status === "authenticated") {
+      loadCompany();
+    }
+  }, [status]);
 
   return (
     <div>
-      <CompanyProfile />
+      <CompanyProfile companyData={dataCompany} />
     </div>
   );
 }

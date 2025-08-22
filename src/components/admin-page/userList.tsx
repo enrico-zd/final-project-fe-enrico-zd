@@ -7,45 +7,87 @@ import {
   TableRow,
 } from "../ui/table";
 import Link from "next/link";
-import { Eye } from 'lucide-react';
+import { Eye, SquarePen } from "lucide-react";
 import { fetchAllUserCompany } from "@/services/UserAPI";
+import { IError, IUserCompanyDetail } from "@/types/interface";
+import { useEffect, useState } from "react";
 
-const UserList = async ({token}: {
-  token: string
-}): Promise<React.JSX.Element> => {
-  const userList = await fetchAllUserCompany(token)
+const UserList = ({token, statusAuth}: {
+  token: string | undefined,
+  statusAuth: string,
+}) => {
+  const [dataUsers, setDataUsers] = useState<IUserCompanyDetail[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<IError | null>(null);
 
-  console.log(userList)
+  const loadUsers = async (): Promise<void> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await fetchAllUserCompany(token);
+      setDataUsers(data);
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (statusAuth === "authenticated"){
+      loadUsers();
+    }
+  }, [statusAuth]);
+
+  console.log(error);
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>No</TableHead>
-          <TableHead>#</TableHead>
-          <TableHead>Full Name</TableHead>
-          <TableHead>Address</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Phone Number</TableHead>
-          <TableHead>Is Active</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {/* {userList.map((user, index: number) => (
-          <TableRow key={index}>
-            <TableCell>{index + 1}</TableCell>
-            <TableCell>
-              <Link href={`./users/${user.id}`}><Eye /></Link>
-            </TableCell>
-            <TableCell>{user.name}</TableCell>
-            <TableCell>{user.address}</TableCell>
-            <TableCell>{user.email}</TableCell>
-            <TableCell>{user.phone_number}</TableCell>
-            <TableCell>{user.is_active}</TableCell>
-          </TableRow>
-        ))} */}
-      </TableBody>
-    </Table>
+    <div>
+      {isLoading ? (
+        <h1>loading</h1>
+      ) : (
+        <Table className="[&_th]:text-center text-center">
+          <TableHeader>
+            <TableRow>
+              <TableHead>No</TableHead>
+              <TableHead>#</TableHead>
+              <TableHead>Full Name</TableHead>
+              <TableHead>Address</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Phone Number</TableHead>
+              <TableHead>Is Active</TableHead>
+              <TableHead>Edit</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {dataUsers.map((user, index: number) => (
+              <TableRow key={index}>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell className="flex justify-center">
+                  <Link href={`./users/${user.user_id}`}>
+                    <Eye />
+                  </Link>
+                </TableCell>
+                <TableCell>{user.user.name}</TableCell>
+                <TableCell>{user.user.address}</TableCell>
+                <TableCell>{user.user.email}</TableCell>
+                <TableCell>{user.user.phone_number}</TableCell>
+                <TableCell>{user.user_status}</TableCell>
+                <TableCell className="flex justify-center">
+                  <Link href={`./users/update/${user.user_id}`}>
+                    <SquarePen />
+                  </Link>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
   );
 };
 
