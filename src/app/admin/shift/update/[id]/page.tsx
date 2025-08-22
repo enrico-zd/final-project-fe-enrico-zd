@@ -1,7 +1,7 @@
 import NavBread from "@/components/nav-bread";
 import ShiftFormUpdate from "@/components/admin-page/shiftFormUpdate";
 
-export default async function UpdateShift({ params }: { params: { id: number } }) {
+export default async function UpdateShift({ params }: { params: Promise<{ id: number }> }) {
   const prevPath = {
     path: "/admin/shift",
     name: "Shift Section",

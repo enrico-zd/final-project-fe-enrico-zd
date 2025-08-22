@@ -18,31 +18,37 @@ const ShiftFormCreate = ({ modes }: { modes: string }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<IError | null>(null);
 
-  const loadUserDetail = async (): Promise<void> => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const user = await fetchUserCompanyById(
-        session?.user.user_id,
-        session?.user.accessToken
-      );
-      setDataUser(user);
-    } catch (err) {
-      setError({
-        message: err instanceof Error ? err.message : "Unknown error occured",
-        name: err instanceof Error ? err.name : undefined,
-        code: err instanceof Error ? 500 : undefined,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (status === "authenticated") {
-      loadUserDetail();
-    }
-  }, [status]);
+    const userId = session?.user.user_id;
+    const accessToken = session?.user.accessToken;
+
+    if (status !== "authenticated" || !userId || !accessToken) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const user = await fetchUserCompanyById(userId, accessToken);
+        if (!cancelled) setDataUser(user);
+      } catch (err) {
+        if (!cancelled) {
+          setError({
+            message: err instanceof Error ? err.message : "Unknown error occured",
+            name: err instanceof Error ? err.name : undefined,
+            code: err instanceof Error ? 500 : undefined,
+          });
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status, session?.user.user_id, session?.user.accessToken]);
 
   console.log(error);
 
@@ -54,6 +60,9 @@ const ShiftFormCreate = ({ modes }: { modes: string }) => {
 
   return (
     <div className="flex flex-col items-center gap-4">
+      {isLoading && (
+        <h1>Loading...</h1>
+      )}
       <div className="bg-amber-200 w-[96%] px-6 py-4 h-full rounded-sm">
         <h1 className="text-2xl text-amber-800">Office Time</h1>
         <form

@@ -14,28 +14,34 @@ export default function DashboardAdmin() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<IError | null>(null);
 
-  const loadData = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const user = await fetchAllUserCompany(session?.user.accessToken);
-      setUserData(user);
-    } catch (err) {
-      setError({
-        message: err instanceof Error ? err.message : "Unknown error occured",
-        name: err instanceof Error ? err.name : undefined,
-        code: err instanceof Error ? 500 : undefined,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (status === "authenticated") {
-      loadData();
-    }
-  }, [status]);
+    if (status !== "authenticated" || !session?.user.accessToken) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const user = await fetchAllUserCompany(session.user.accessToken);
+        if (!cancelled) setUserData(user);
+      } catch (err) {
+        if (!cancelled) {
+          setError({
+            message:
+              err instanceof Error ? err.message : "Unknown error occured",
+            name: err instanceof Error ? err.name : undefined,
+            code: err instanceof Error ? 500 : undefined,
+          });
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true; // mencegah setState setelah unmount
+    };
+  }, [status, session?.user.accessToken]);
 
   // count gender
   const male = userData?.filter((u) => u.user.gender === "MALE").length;
@@ -63,7 +69,7 @@ export default function DashboardAdmin() {
     return acc;
   }, {});
 
-  if(!ageCounts) return;
+  if (!ageCounts) return;
 
   const dataAgeArr = Object.entries(ageCounts)
     .map(([age, count]) => ({ age: Number(age), count }))
@@ -73,6 +79,7 @@ export default function DashboardAdmin() {
 
   return (
     <div className="flex flex-col items-center gap-4">
+      {isLoading && <h1>Loading....</h1>}
       <div className="self-start ml-6">
         <h1 className="text-4xl">Dashboard</h1>
       </div>
