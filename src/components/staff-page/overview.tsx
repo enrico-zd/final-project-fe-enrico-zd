@@ -46,6 +46,8 @@ const Overview = () => {
     };
   }, [status, session?.user.accessToken]);
 
+  console.log(attendance)
+
   // fetch leave request
   useEffect(() => {
     if (status !== "authenticated" || !session?.user.accessToken) return;

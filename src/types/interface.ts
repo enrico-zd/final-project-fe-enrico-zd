@@ -42,26 +42,26 @@ export enum PaidLeave {
   No = "No",
 }
 
-export enum AttendanceStatus { 
-  Present = "PRESENT", 
-  Late = "LATE", 
-  Absent = "ABSENT", 
-  Leave = "LEAVE" 
+export enum AttendanceStatus {
+  Present = "PRESENT",
+  Late = "LATE",
+  Absent = "ABSENT",
+  Leave = "LEAVE",
 }
 
-export enum StatusApproval { 
+export enum StatusApproval {
   Pending = "PENDING",
   Approved = "APPROVED",
-  Rejected = "REJECTED"
+  Rejected = "REJECTED",
 }
 
-export enum AttendanceBy { 
+export enum AttendanceBy {
   Admin = "ADMIN",
-  Self = "SELF"
+  Self = "SELF",
 }
-export enum Gender { 
+export enum Gender {
   Male = "MALE",
-  Female = "FEMALE"
+  Female = "FEMALE",
 }
 
 export interface IError {
@@ -126,6 +126,14 @@ export interface IUser {
   role: Role;
 }
 
+export interface IUpdateUser {
+  username: string;
+  address: string;
+  phone_number: string;
+  date_of_birth: string;
+  gender: Gender;
+}
+
 // user company detail interface
 export interface IUserCompanyDetail {
   user_company_id: number;
@@ -162,6 +170,7 @@ export interface ILeaveType {
 
 export interface ILeaveRequest {
   leave_request_id: number;
+  leave_type_id: number;
   type: ILeaveType;
   from: string;
   to: string;
@@ -169,10 +178,18 @@ export interface ILeaveRequest {
   user: IUser;
   requested_days: number;
   reason: string;
-  approved_by: IUser;
+  approver: IUser;
   approved_at: string;
   admin_remark: string;
   status: StatusApproval;
+}
+
+export interface ICreateLeaveRequest {
+  leave_type_id: number;
+  from: string;
+  to: string;
+  reason: string;
+  proof_image: string;
 }
 
 export interface ITimeAndDate {
@@ -193,4 +210,11 @@ export interface IAttendance {
   late_minute: number;
   overtime_min: number;
   status: StatusApproval;
+}
+export interface ICheckIn {
+  check_in_at: string;
+}
+
+export interface ICheckOut {
+  check_out_at: string;
 }

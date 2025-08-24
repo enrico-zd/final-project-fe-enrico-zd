@@ -1,18 +1,21 @@
 "use client";
 
-import { fetchUser } from "@/services/UserAPI";
+import { fetchUpdateUser, fetchUser } from "@/services/UserAPI";
 import { IError, IUser } from "@/types/interface";
 import { format, parseISO } from "date-fns";
 import { ArrowLeft, Calendar, MapPin, Phone, User } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 const EditProfile = () => {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [user, setUser] = useState<IUser>();
   const [error, setError] = useState<IError | null>(null);
+  const [success, setSuccess] = useState<string>("");
 
   // fetch User
   useEffect(() => {
@@ -33,7 +36,7 @@ const EditProfile = () => {
             code: err instanceof Error ? 500 : undefined,
           });
         }
-      } 
+      }
     })();
 
     return () => {
@@ -57,19 +60,30 @@ const EditProfile = () => {
   }, [user, reset]);
   const selectedGender = watch("gender");
 
-  const onSubmit: SubmitHandler<IUser> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<IUser> = async (data) => {
+    setError(null);
+
+    try {
+      setSuccess("");
+      await fetchUpdateUser(session?.user.user_id, data);
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setSuccess("Update Berhasil");
+      setTimeout(() => {
+        router.push("/staff/profile");
+      }, 1000);
+    }
+  };
 
   if (!user) return;
 
   return (
     <div>
-      {error && (
-        <div>
-          <p>{error.message}</p>
-          <p>{error.name}</p>
-          <p>{error.code}</p>
-        </div>
-      )}
       <div className="w-[375px] h-screen shadow shadow-amber-200 bg-amber-100">
         <div className="flex flex-row gap-2 p-2 items-center">
           <div>
@@ -84,6 +98,19 @@ const EditProfile = () => {
         <div className="flex flex-col items-center gap-4">
           <div className="bg-amber-200 w-[96%] px-6 py-4 h-full rounded-sm">
             <form onSubmit={handleSubmit(onSubmit)}>
+              {error ? (
+                <div>
+                  <p>{error.message}</p>
+                  <p>{error.name}</p>
+                  <p>{error.code}</p>
+                </div>
+              ) : (
+                success && (
+                  <div>
+                    <p>{success}</p>
+                  </div>
+                )
+              )}
               <div className="relative py-1">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 opacity-80">
                   <User />

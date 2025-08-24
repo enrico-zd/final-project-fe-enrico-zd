@@ -17,7 +17,6 @@ export default function RegisterForm() {
   } = useForm<IRegisterInput>();
 
   const onSubmit: SubmitHandler<IRegisterInput> = async (data) => {
-    console.log(data);
     setIsLoading(true);
     setError(null);
 

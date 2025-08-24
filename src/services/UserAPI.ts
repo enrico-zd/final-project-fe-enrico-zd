@@ -1,5 +1,6 @@
-import { IUser, IUserCompanyDetail } from "@/types/interface";
+import { IUpdateUser, IUser, IUserCompanyDetail } from "@/types/interface";
 
+// === user ===
 export const fetchUser = async (userId: number | undefined): Promise<IUser> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL!}/users/${userId}`
@@ -12,6 +13,37 @@ export const fetchUser = async (userId: number | undefined): Promise<IUser> => {
   return response.json();
 };
 
+export const fetchUpdateUser = async (
+  userId: number | undefined,
+  data: IUpdateUser
+): Promise<IUser> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL!}/users/${userId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!response.ok) {
+    let detail = null;
+    try {
+      detail = await response.json();
+    } catch {}
+    const msg =
+      detail?.message && Array.isArray(detail.message)
+        ? detail.message.join(", ")
+        : detail?.message || "Failed to update user";
+    throw new Error(`${response.status} ${response.statusText} - ${msg}`);
+  }
+
+  return response.json();
+};
+
+// === user company detail ===
 export const fetchUserCompanyById = async (
   id: number | undefined,
   accessToken: string | undefined

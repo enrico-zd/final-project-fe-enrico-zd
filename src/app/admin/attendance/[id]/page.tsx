@@ -1,9 +1,16 @@
 import NavBread from "@/components/nav-bread";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { authOptions } from "@/lib/auth";
 import { minutesToHm } from "@/lib/minutToHour";
+import { TimeFormat } from "@/lib/timeFormating";
 import { fetchAllUserAttendanceById } from "@/services/AttendanceApi";
-import { format, parseISO } from "date-fns";
 import { getServerSession } from "next-auth";
 
 export default async function AttendanceDetail({
@@ -12,14 +19,17 @@ export default async function AttendanceDetail({
   params: Promise<{ id: number }>;
 }) {
   const { id } = await params;
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
   const prevPath = {
     path: "./",
     name: "Attendance Section",
   };
 
-  const attendanceList = await fetchAllUserAttendanceById(id, session?.user.accessToken)
+  const attendanceList = await fetchAllUserAttendanceById(
+    id,
+    session?.user.accessToken
+  );
 
   return (
     <div>
@@ -45,14 +55,40 @@ export default async function AttendanceDetail({
         <TableBody>
           {attendanceList.map((attendance) => (
             <TableRow key={attendance.attendance_id}>
-              <TableCell>{formatAttendanceDate(attendance.attendance_date)}</TableCell>
-              <TableCell>{attendance.check_in_at === null ? "-" : format(parseISO(attendance.check_in_at), "HH:mm:ss")}</TableCell>
-              <TableCell>{attendance.check_out_at === null ? "-" : format(parseISO(attendance.check_out_at), "HH:mm:ss")}</TableCell>
-              <TableCell>{attendance.check_out_at === null ? "-" : minutesToHm(attendance.hours_work_min)}</TableCell>
-              <TableCell>{attendance.check_out_at === null ? "-" :attendance.late_minute}</TableCell>
-              <TableCell>{attendance.check_out_at === null ? "-" :attendance.overtime_min}</TableCell>
+              <TableCell>
+                {formatAttendanceDate(attendance.attendance_date)}
+              </TableCell>
+              <TableCell>
+                {attendance.check_in_at === null
+                  ? "-"
+                  : TimeFormat(attendance.check_in_at)}
+              </TableCell>
+              <TableCell>
+                {attendance.check_out_at === null
+                  ? "-"
+                  : TimeFormat(attendance.check_out_at)}
+              </TableCell>
+              <TableCell>
+                {attendance.check_out_at === null
+                  ? "-"
+                  : minutesToHm(attendance.hours_work_min)}
+              </TableCell>
+              <TableCell>
+                {attendance.check_out_at === null
+                  ? "-"
+                  : attendance.late_minute}
+              </TableCell>
+              <TableCell>
+                {attendance.check_out_at === null
+                  ? "-"
+                  : attendance.overtime_min}
+              </TableCell>
               <TableCell>{attendance.attendance_status}</TableCell>
-              <TableCell>{attendance.attendance_by === null ? "-" :attendance.attendance_by}</TableCell>
+              <TableCell>
+                {attendance.attendance_by === null
+                  ? "-"
+                  : attendance.attendance_by}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -67,6 +103,6 @@ function formatAttendanceDate(dateStr: string) {
     day: "2-digit",
     month: "short",
     year: "numeric",
-    weekday: "short"
+    weekday: "short",
   });
 }

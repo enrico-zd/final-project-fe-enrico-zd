@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import AttendHistoryList from "@/components/staff-page/attendanceHistoryList";
 import { ArrowLeft } from "lucide-react";
