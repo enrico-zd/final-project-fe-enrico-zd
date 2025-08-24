@@ -11,11 +11,11 @@ import { authOptions } from "@/lib/auth";
 import { fetchLeaveRequest } from "@/services/LeaveRequest";
 
 const LeaveList = async () => {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
-  const leaveList = await fetchLeaveRequest(session?.user.accessToken)
+  const leaveList = await fetchLeaveRequest(session?.user.accessToken);
 
-  console.log(leaveList)
+  console.log(leaveList);
   return (
     <Table className="text-center [&_th]:text-center">
       <TableHeader>
@@ -44,8 +44,14 @@ const LeaveList = async () => {
             <TableCell>{leave.user.name}</TableCell>
             <TableCell>{leave.requested_days}</TableCell>
             <TableCell>{leave.reason}</TableCell>
-            <TableCell className="whitespace-pre-line">{leave.approved_by === null ? "-" : `${leave.user.name}\n(${leave.user.role})`}</TableCell>
-            <TableCell>{leave.approved_at === null ? "-" : leave.approved_at}</TableCell>
+            <TableCell className="whitespace-pre-line">
+              {leave.approver === null
+                ? "-"
+                : `${leave.user.name}\n(${leave.user.role})`}
+            </TableCell>
+            <TableCell>
+              {leave.approved_at === null ? "-" : leave.approved_at}
+            </TableCell>
             <TableCell>{leave.status}</TableCell>
           </TableRow>
         ))}
@@ -60,16 +66,15 @@ function formatDate(dateStr: string) {
     day: "2-digit",
     month: "short",
   });
-
 }
 
 function formatRequestDate(dateStr: string) {
-const date = new Date(dateStr);
-return date.toLocaleDateString("en-GB", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-});
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export default LeaveList;

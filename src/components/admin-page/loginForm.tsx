@@ -1,6 +1,6 @@
 "use client";
 import { ILoginInput } from "@/types/interface";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -32,11 +32,22 @@ export default function LoginForm() {
 
       if (result?.error) {
         setError(result.error);
+        setIsLoading(false);
       } else if (result?.ok) {
         setSuccess(`Berhasil Login!`);
-        setTimeout(() => {
+        setTimeout(async () => {
           router.refresh();
-          router.push("/staff/dashboard");
+
+          const session = await getSession();
+          const role = session?.user.role;
+
+          if (role === "ADMIN") {
+            router.push("/admin/dashboard");
+          } else if (role === "STAFF") {
+            router.push("/staff/dashboard");
+          } else {
+            router.push("/");
+          }
         }, 500);
       }
     } catch (error) {

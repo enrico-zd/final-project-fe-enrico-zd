@@ -11,9 +11,9 @@ import {
 } from "../ui/table";
 import { IError, IShift } from "@/types/interface";
 import { fetchShift } from "@/services/ShiftAPI";
-import { format, parseISO } from "date-fns";
 import Link from "next/link";
 import { SquarePen } from "lucide-react";
+import { TimeFormat } from "@/lib/timeFormating";
 
 const ShiftList = ({
   token,
@@ -81,10 +81,10 @@ const ShiftList = ({
               <TableCell>{index + 1}</TableCell>
               <TableCell>{shift.title}</TableCell>
               <TableCell>
-                {format(parseISO(shift.opening_time), "HH:mm:ss")}
+                {TimeFormat(shift.opening_time)}
               </TableCell>
               <TableCell>
-                {format(parseISO(shift.closing_time), "HH:mm:ss")}
+                {TimeFormat(shift.closing_time)}
               </TableCell>
               <TableCell>{shift.status}</TableCell>
               <TableCell className="flex justify-center">

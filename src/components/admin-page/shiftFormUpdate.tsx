@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { fetchShiftById } from "@/services/ShiftAPI";
 import { fetchUserCompanyById } from "@/services/UserAPI";
-import { format, parseISO } from "date-fns";
+import { TimeFormat } from "@/lib/timeFormating";
 
 const ShiftFormUpdate = ({ id, modes }: { id?: number; modes: string }) => {
   const { data: session, status } = useSession();
@@ -121,7 +121,7 @@ const ShiftFormUpdate = ({ id, modes }: { id?: number; modes: string }) => {
               id="opening_time"
               defaultValue={
                 modes === "update" && shiftData.opening_time !== null
-                  ? format(parseISO(shiftData.opening_time), "HH:mm:ss")
+                  ? TimeFormat(shiftData.opening_time)
                   : ""
               }
               className="bg-amber-50 p-1 rounded-sm"
@@ -137,7 +137,7 @@ const ShiftFormUpdate = ({ id, modes }: { id?: number; modes: string }) => {
               id="closing_time"
               defaultValue={
                 modes === "update" && shiftData.closing_time !== null
-                  ? format(parseISO(shiftData.closing_time), "HH:mm:ss")
+                  ? TimeFormat(shiftData.closing_time)
                   : ""
               }
               className="bg-amber-50 p-1 rounded-sm"

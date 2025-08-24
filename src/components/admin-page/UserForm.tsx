@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable jsx-a11y/alt-text */
 "use client";
+import { TimeFormat } from "@/lib/timeFormating";
 import { fetchShift } from "@/services/ShiftAPI";
 import { fetchUserCompanyById } from "@/services/UserAPI";
 import {
@@ -381,10 +382,9 @@ function CompanyDetails({
             </option>
             {shiftData?.map((shift: IShift) => (
               <option key={shift.shift_id} value={shift.shift_id}>
-                {`${shift.title} ${format(
-                  parseISO(shift.opening_time),
-                  "HH:mm:ss"
-                )} - ${format(parseISO(shift.closing_time), "HH:mm:ss")}`}
+                {`${shift.title} ${TimeFormat(
+                  shift.opening_time
+                )} - ${TimeFormat(shift.closing_time)}`}
               </option>
             ))}
           </select>
