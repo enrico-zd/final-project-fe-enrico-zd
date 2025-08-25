@@ -62,7 +62,7 @@ type dataTotalProps = {
   totalContract: number | undefined;
   totalPermanent: number | undefined;
   totalTemporary: number | undefined;
-  totalAges: {age: number, count: number}[]
+  totalAges: { age: number; count: number }[];
 };
 export default function ChartEmployeeSumarry({
   totalMale,
@@ -72,7 +72,6 @@ export default function ChartEmployeeSumarry({
   totalTemporary,
   totalAges,
 }: dataTotalProps) {
-
   // gender chart data
   const genderChartData = [
     { gender: "Male", count: totalMale, fill: "var(--color-male)" },
@@ -98,10 +97,12 @@ export default function ChartEmployeeSumarry({
     },
   ];
   return (
-    <div className="grid grid-cols-[repeat(3,400px)] justify-items-center gap-4">
-      <Card className="w-[380px] h-[390px]">
+    <div className="grid xl:grid-cols-[repeat(3,400px)] lg:grid-cols-[repeat(2,400px)] md:grid-cols-[repeat(1,200px)] justify-items-center gap-4">
+      <Card className="w-[380px] h-[390px] bg-amber-200">
         <CardHeader className="items-center pb-0">
-          <CardTitle className="text-2xl">Employee Type</CardTitle>
+          <CardTitle className="text-2xl text-amber-700">
+            Employee Type
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex-1 pb-0">
           <ChartContainer
@@ -112,16 +113,16 @@ export default function ChartEmployeeSumarry({
               <Pie data={employeeTypeChartData} dataKey="visitors" />
               <ChartLegend
                 content={<ChartLegendContent nameKey="employee_type" />}
-                className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+                className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center text-amber-700"
               />
             </PieChart>
           </ChartContainer>
         </CardContent>
       </Card>
 
-      <Card className="w-[380px] h-[390px]">
+      <Card className="w-[380px] h-[390px] bg-amber-200">
         <CardHeader>
-          <CardTitle className="text-2xl">Gender</CardTitle>
+          <CardTitle className="text-2xl text-amber-700">Gender</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col justify-end h-full p-0 pr-2">
           <ChartContainer config={genderChartConfig} className="h-full">
@@ -157,9 +158,9 @@ export default function ChartEmployeeSumarry({
         </CardContent>
       </Card>
 
-      <Card className="w-[380px] h-[390px]">
+      <Card className="w-[380px] h-[390px] bg-amber-200">
         <CardHeader>
-          <CardTitle className="text-2xl">Age</CardTitle>
+          <CardTitle className="text-2xl text-amber-700">Age</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col justify-end h-full p-0 pr-2">
           <ChartContainer config={ageChartConfig} className="h-full">

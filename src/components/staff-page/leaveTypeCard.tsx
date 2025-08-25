@@ -69,7 +69,7 @@ const LeaveTypeCard = ({
         </div>
       )}
       {isLoading && (
-        <div className="grid grid-cols-2 justify-items-center mt-4">
+        <div className="grid grid-cols-2 justify-items-center mt-2">
           <Card className="data-[slot=card]:w-[160px]">
             <CardHeader className="flex flex-col h-[90px] justify-center items-center w-full">
               <div>
@@ -100,9 +100,9 @@ const LeaveTypeCard = ({
           </Card>
         </div>
       )}
-      <div className="grid grid-cols-2 justify-items-center mt-4">
+      <div className="grid grid-cols-2 justify-items-center mt-2">
         {leaveType.map((type) => (
-          <Card key={type.leave_type_id} className="data-[slot=card]:w-[160px]">
+          <Card key={type.leave_type_id} className="data-[slot=card]:w-[170px]">
             <CardHeader className="flex flex-col h-[90px] justify-center items-center w-full">
               <div>
                 <CardDescription>{type.leave_type_name}</CardDescription>

@@ -56,7 +56,7 @@ const AttendHistoryList = () => {
   console.log(attendance);
 
   return (
-    <Table>
+    <div>
       {error && (
         <div>
           <p>{error.message}</p>
@@ -69,33 +69,35 @@ const AttendHistoryList = () => {
           <p>Loading...</p>
         </div>
       )}
-      <TableHeader>
-        <TableRow>
-          <TableHead className="text-center">Date</TableHead>
-          <TableHead className="text-center">Day</TableHead>
-          <TableHead className="text-center">Start Time</TableHead>
-          <TableHead className="text-center">End Time</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {attendance.map((history) => (
-          <TableRow key={history.attendance_id}>
-            <TableCell className="text-center">
-              {format(new Date(history.attendance_date), "MMM dd")}
-            </TableCell>
-            <TableCell className="text-center">
-              {format(new Date(history.attendance_date), "EEE")}
-            </TableCell>
-            <TableCell className="text-center">
-              {TimeFormat(history.check_in_at)}
-            </TableCell>
-            <TableCell className="text-center">
-              {TimeFormat(history.check_out_at)}
-            </TableCell>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="text-center">Date</TableHead>
+            <TableHead className="text-center">Day</TableHead>
+            <TableHead className="text-center">Start Time</TableHead>
+            <TableHead className="text-center">End Time</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {attendance.map((history) => (
+            <TableRow key={history.attendance_id}>
+              <TableCell className="text-center">
+                {format(new Date(history.attendance_date), "MMM dd")}
+              </TableCell>
+              <TableCell className="text-center">
+                {format(new Date(history.attendance_date), "EEE")}
+              </TableCell>
+              <TableCell className="text-center">
+                {TimeFormat(history.check_in_at)}
+              </TableCell>
+              <TableCell className="text-center">
+                {TimeFormat(history.check_out_at)}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 

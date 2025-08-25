@@ -18,7 +18,7 @@ export default function CompanyProfile({
       <div className="self-start">
         <NavBread currentPage="Company Profile" />
       </div>
-      <div className="bg-amber-200 w-[96%] px-6 py-4 h-full rounded-sm">
+      <div className="bg-amber-200 w-[98%] px-6 py-4 h-full rounded-sm">
         <h1 className="text-4xl text-amber-800">Company Profile</h1>
         <form
           onSubmit={handleSubmit(onSubmit)}

@@ -1,8 +1,9 @@
 export const TimeFormat = (dateTime: string) => {
-  const date = new Date(dateTime)
+  const date = new Date(dateTime);
   const hh = String(date.getUTCHours()).padStart(2, "0");
   const mm = String(date.getUTCMinutes()).padStart(2, "0");
+  const ss = String(date.getUTCSeconds()).padStart(2, "0");
 
-  const result = `${hh}:${mm}`
-  return result
+  const result = `${hh}:${mm}:${ss}`;
+  return result;
 };

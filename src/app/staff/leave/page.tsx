@@ -56,7 +56,7 @@ export default function StaffLeave() {
           </div>
         </div>
       </div>
-      <p>Leave</p>
+      <p className="pl-2.5 text-2xl font-semibold">Leave</p>
       <LeaveTypeCard
         accessToken={session?.user.accessToken}
         statusSession={status}
@@ -69,7 +69,9 @@ export default function StaffLeave() {
           Issue Leave
         </button>
       </div>
-      <p className="text-center mt-4">Recent Leave Activity</p>
+      <p className="text-center mt-4 mb-1 text-2xl font-semibold">
+        Recent Leave Activity
+      </p>
       <div className="flex justify-center">
         <LeaveActivity
           accessToken={session?.user.accessToken}

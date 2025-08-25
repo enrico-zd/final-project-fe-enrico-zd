@@ -15,7 +15,7 @@ export default async function Attendance() {
       <div>
         <NavBread currentPage="Employee Attendance List" />
       </div>
-      <div>
+      <div className="px-2 pt-4">
         <AttendanceList companyId={users.company_id} token={session?.user.accessToken}/>
       </div>
     </div>

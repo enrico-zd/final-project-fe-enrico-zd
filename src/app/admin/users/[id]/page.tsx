@@ -26,9 +26,9 @@ export default async function UserDetail({
       <div>
         <NavBread currentPage="Users Detail" prevPath={prevPath} />
       </div>
-      <div className="flex flex-row w-full justify-center gap-8 mt-10">
+      <div className="flex flex-row w-full justify-center gap-8 mt-4">
         <div>
-          <Card>
+          <Card className="bg-amber-200 ring-1 ring-amber-400 text-amber-800">
             <CardHeader>
               <CardTitle>User Detail</CardTitle>
             </CardHeader>
@@ -83,7 +83,7 @@ export default async function UserDetail({
           </Card>
         </div>
         <div>
-          <Card>
+          <Card className="bg-amber-200 ring-1 ring-amber-400 text-amber-800">
             <CardHeader>
               <CardTitle>Office Detail</CardTitle>
             </CardHeader>

@@ -9,16 +9,17 @@ import {
 } from "../ui/table";
 import { authOptions } from "@/lib/auth";
 import { fetchLeaveRequest } from "@/services/LeaveRequest";
+import { format, parseISO } from "date-fns";
+import { TimeFormat } from "@/lib/timeFormating";
 
 const LeaveList = async () => {
   const session = await getServerSession(authOptions);
 
   const leaveList = await fetchLeaveRequest(session?.user.accessToken);
 
-  console.log(leaveList);
   return (
-    <Table className="text-center [&_th]:text-center">
-      <TableHeader>
+    <Table className="[&_th]:text-center [&_th]:text-white text-center rounded-xl overflow-hidden">
+      <TableHeader className="bg-amber-400">
         <TableRow>
           <TableHead>#</TableHead>
           <TableHead>Type</TableHead>
@@ -33,7 +34,7 @@ const LeaveList = async () => {
           <TableHead>Status</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody className="bg-amber-100">
         {leaveList.map((leave, index: number) => (
           <TableRow key={index}>
             <TableCell>{index + 1}</TableCell>
@@ -50,7 +51,11 @@ const LeaveList = async () => {
                 : `${leave.user.name}\n(${leave.user.role})`}
             </TableCell>
             <TableCell>
-              {leave.approved_at === null ? "-" : leave.approved_at}
+              {leave.approved_at === null
+                ? "-"
+                : format(parseISO(leave.approved_at), "yyyy-MM-dd")}
+              {<br />}
+              {leave.approved_at === null ? "-" : TimeFormat(leave.approved_at)}
             </TableCell>
             <TableCell>{leave.status}</TableCell>
           </TableRow>

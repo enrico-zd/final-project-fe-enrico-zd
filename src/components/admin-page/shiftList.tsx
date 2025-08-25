@@ -62,10 +62,10 @@ const ShiftList = ({
 
   console.log(error);
   return (
-    <div>
+    <div className="px-2">
       {isLoading && <h1>Loading...</h1>}
-      <Table className="[&_th]:text-center text-center">
-        <TableHeader>
+      <Table className="[&_th]:text-center [&_th]:text-white text-center rounded-xl overflow-hidden">
+        <TableHeader className="bg-amber-400">
           <TableRow>
             <TableHead>No</TableHead>
             <TableHead>Title</TableHead>
@@ -75,17 +75,13 @@ const ShiftList = ({
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
+        <TableBody className="bg-amber-100">
           {shiftData.map((shift, index: number) => (
             <TableRow key={index}>
               <TableCell>{index + 1}</TableCell>
               <TableCell>{shift.title}</TableCell>
-              <TableCell>
-                {TimeFormat(shift.opening_time)}
-              </TableCell>
-              <TableCell>
-                {TimeFormat(shift.closing_time)}
-              </TableCell>
+              <TableCell>{TimeFormat(shift.opening_time)}</TableCell>
+              <TableCell>{TimeFormat(shift.closing_time)}</TableCell>
               <TableCell>{shift.status}</TableCell>
               <TableCell className="flex justify-center">
                 <div>

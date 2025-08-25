@@ -69,20 +69,22 @@ const ProfileDetail = () => {
             <p>{user.username}</p>
             <p>{user.email}</p>
           </div>
-          <div>
-            <h2>Other Detail</h2>
-            <div className="flex flex-row justify-between p-3 m-1">
+          <div className="px-2 pt-4">
+            <h2 className="pl-1 text-xl font-semibold">Other Detail</h2>
+            <div className="flex flex-row justify-between p-3 m-1 bg-amber-200 shadow-lg rounded-lg font-semibold">
               <div>
-                <p>Phone Number</p>
-                <p>Date of Birth</p>
-                <p>Gender</p>
-                <p>Address</p>
+                <p className="py-1">Phone Number</p>
+                <p className="py-1">Date of Birth</p>
+                <p className="py-1">Gender</p>
+                <p className="py-1">Address</p>
               </div>
               <div>
-                <p>{user.phone_number}</p>
-                <p>{format(parseISO(user.date_of_birth), "yyyy-MM-dd")}</p>
-                <p>{user.gender}</p>
-                <p>{user.address}</p>
+                <p className="py-1">{user.phone_number}</p>
+                <p className="py-1">
+                  {format(parseISO(user.date_of_birth), "yyyy-MM-dd")}
+                </p>
+                <p className="py-1">{user.gender}</p>
+                <p className="py-1">{user.address}</p>
               </div>
             </div>
           </div>
