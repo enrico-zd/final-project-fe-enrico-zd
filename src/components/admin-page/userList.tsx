@@ -60,12 +60,12 @@ const UserList = ({
   console.log(error);
 
   return (
-    <div>
+    <div className="px-2">
       {isLoading ? (
         <h1>loading</h1>
       ) : (
-        <Table className="[&_th]:text-center text-center">
-          <TableHeader>
+        <Table className="[&_th]:text-center [&_th]:text-white text-center rounded-xl overflow-hidden">
+          <TableHeader className="bg-amber-400">
             <TableRow>
               <TableHead>No</TableHead>
               <TableHead>#</TableHead>
@@ -77,7 +77,7 @@ const UserList = ({
               <TableHead>Edit</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="bg-amber-100">
             {dataUsers.map((user, index: number) => (
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>

@@ -1,6 +1,13 @@
-"use client"
+"use client";
 
-import { FileClock, FileMinus, FileText, LogIn, LogOut, User } from "lucide-react";
+import {
+  FileClock,
+  FileMinus,
+  FileText,
+  LogIn,
+  LogOut,
+  User,
+} from "lucide-react";
 import {
   Card,
   CardAction,
@@ -9,85 +16,111 @@ import {
   CardTitle,
 } from "./ui/card";
 
-export default function SectionCard({totalUser}: {totalUser: number | undefined}) {
-  
-
+export default function SectionCard({
+  totalUser,
+}: {
+  totalUser: number | undefined;
+}) {
   return (
-    <div className="grid grid-cols-[repeat(3,400px)] grid-rows-2 justify-items-center gap-4">
-      <Card className="data-[slot=card]:w-[380px]">
+    <div className="grid xl:grid-cols-[repeat(3,400px)] lg:grid-cols-[repeat(2,400px)] md:grid-cols-[repeat(1,200px)] grid-rows-2 justify-items-center gap-4">
+      <Card className="data-[slot=card]:w-[380px] bg-amber-200">
         <CardHeader className="flex flex-col h-[90px] justify-between w-full">
           <div className="">
-            <CardTitle className="text-2xl">Total Employee</CardTitle>
+            <CardTitle className="text-2xl text-amber-700">
+              Total Employee
+            </CardTitle>
           </div>
           <div className="w-full flex flex-row items-center justify-between">
-            <CardDescription className="text-2xl">{totalUser}</CardDescription>
+            <CardDescription className="text-2xl text-amber-700">
+              {totalUser}
+            </CardDescription>
             <CardAction>
-              <User size={50} />
+              <User className=" text-amber-700" size={50} />
             </CardAction>
           </div>
         </CardHeader>
       </Card>
-      <Card className="data-[slot=card]:w-[380px]">
+      <Card className="data-[slot=card]:w-[380px] bg-amber-200">
         <CardHeader className="flex flex-col h-[90px] justify-between w-full">
           <div className="">
-            <CardTitle className="text-2xl">Paid Leave</CardTitle>
+            <CardTitle className="text-2xl text-amber-700">
+              Paid Leave
+            </CardTitle>
           </div>
           <div className="w-full flex flex-row items-center justify-between">
-            <CardDescription className="text-2xl">10</CardDescription>
+            <CardDescription className="text-2xl text-amber-700">
+              10
+            </CardDescription>
             <CardAction>
-              <FileText size={50} />
+              <FileText className=" text-amber-700" size={50} />
             </CardAction>
           </div>
         </CardHeader>
       </Card>
-      <Card className="data-[slot=card]:w-[380px]">
+      <Card className="data-[slot=card]:w-[380px] bg-amber-200">
         <CardHeader className="flex flex-col h-[90px] justify-between w-full">
           <div className="">
-            <CardTitle className="text-2xl">On Leaves Today</CardTitle>
+            <CardTitle className="text-2xl text-amber-700">
+              On Leaves Today
+            </CardTitle>
           </div>
           <div className="w-full flex flex-row items-center justify-between">
-            <CardDescription className="text-2xl">10</CardDescription>
+            <CardDescription className="text-2xl text-amber-700">
+              10
+            </CardDescription>
             <CardAction>
-              <FileMinus size={50} />
+              <FileMinus className=" text-amber-700" size={50} />
             </CardAction>
           </div>
         </CardHeader>
       </Card>
-      <Card className="data-[slot=card]:w-[380px]">
+      <Card className="data-[slot=card]:w-[380px] bg-amber-200">
         <CardHeader className="flex flex-col h-[90px] justify-between w-full">
           <div className="">
-            <CardTitle className="text-2xl">Pending Leaves</CardTitle>
+            <CardTitle className="text-2xl text-amber-700">
+              Pending Leaves
+            </CardTitle>
           </div>
           <div className="w-full flex flex-row items-center justify-between">
-            <CardDescription className="text-2xl">10</CardDescription>
+            <CardDescription className="text-2xl text-amber-700">
+              10
+            </CardDescription>
             <CardAction>
-              <FileClock size={50} />
+              <FileClock className=" text-amber-700" size={50} />
             </CardAction>
           </div>
         </CardHeader>
       </Card>
-      <Card className="data-[slot=card]:w-[380px]">
+      <Card className="data-[slot=card]:w-[380px] bg-amber-200">
         <CardHeader className="flex flex-col h-[90px] justify-between w-full">
           <div className="">
-            <CardTitle className="text-2xl">Check In Today</CardTitle>
+            <CardTitle className="text-2xl text-amber-700">
+              Check In Today
+            </CardTitle>
           </div>
           <div className="w-full flex flex-row items-center justify-between">
-            <CardDescription className="text-2xl">10</CardDescription>
+            <CardDescription className="text-2xl text-amber-700">
+              10
+            </CardDescription>
             <CardAction>
-              <LogIn size={50} />
+              <LogIn className=" text-amber-700" size={50} />
             </CardAction>
           </div>
         </CardHeader>
       </Card>
-      <Card className="data-[slot=card]:w-[380px]">
+      <Card className="data-[slot=card]:w-[380px] bg-amber-200">
         <CardHeader className="flex flex-col h-[90px] justify-between w-full">
           <div className="">
-            <CardTitle className="text-2xl">Check Out Today</CardTitle>
+            <CardTitle className="text-2xl text-amber-700">
+              Check Out Today
+            </CardTitle>
           </div>
           <div className="w-full flex flex-row items-center justify-between">
-            <CardDescription className="text-2xl">10</CardDescription>
+            <CardDescription className="text-2xl text-amber-700">
+              10
+            </CardDescription>
             <CardAction>
-              <LogOut size={50} />
+              <LogOut className=" text-amber-700" size={50} />
             </CardAction>
           </div>
         </CardHeader>

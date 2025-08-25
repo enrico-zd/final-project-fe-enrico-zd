@@ -81,18 +81,28 @@ export default function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleClick}>
-              <User />
+            <DropdownMenuItem
+              onClick={handleClick}
+              className="hover:!bg-amber-200 hover:!text-amber-800"
+            >
+              <User className="hover:!text-amber-800" />
               Account
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href={`/admin/users/update/${user_id}`} className="flex items-center gap-2">
-                <Edit /> <div>Edit Profile</div>
+            <DropdownMenuItem className="hover:!bg-amber-200 hover:!text-amber-800">
+              <Link
+                href={`/admin/users/update/${user_id}`}
+                className="flex items-center gap-2"
+              >
+                <Edit className="hover:!text-amber-800" />{" "}
+                <div>Edit Profile</div>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
-              <LogOut />
+            <DropdownMenuItem
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="hover:!bg-red-200 hover:!text-red-600"
+            >
+              <LogOut className="hover:!text-red-600" />
               Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>

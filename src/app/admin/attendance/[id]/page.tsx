@@ -39,60 +39,62 @@ export default async function AttendanceDetail({
           prevPath={prevPath}
         />
       </div>
-      <Table className="text-center [&_th]:text-center">
-        <TableHeader>
-          <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Check In At</TableHead>
-            <TableHead>check Out At</TableHead>
-            <TableHead>Work Hour</TableHead>
-            <TableHead>Late Minutes</TableHead>
-            <TableHead>Overtime (Hours)</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Attendance By</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {attendanceList.map((attendance) => (
-            <TableRow key={attendance.attendance_id}>
-              <TableCell>
-                {formatAttendanceDate(attendance.attendance_date)}
-              </TableCell>
-              <TableCell>
-                {attendance.check_in_at === null
-                  ? "-"
-                  : TimeFormat(attendance.check_in_at)}
-              </TableCell>
-              <TableCell>
-                {attendance.check_out_at === null
-                  ? "-"
-                  : TimeFormat(attendance.check_out_at)}
-              </TableCell>
-              <TableCell>
-                {attendance.check_out_at === null
-                  ? "-"
-                  : minutesToHm(attendance.hours_work_min)}
-              </TableCell>
-              <TableCell>
-                {attendance.check_out_at === null
-                  ? "-"
-                  : attendance.late_minute}
-              </TableCell>
-              <TableCell>
-                {attendance.check_out_at === null
-                  ? "-"
-                  : attendance.overtime_min}
-              </TableCell>
-              <TableCell>{attendance.attendance_status}</TableCell>
-              <TableCell>
-                {attendance.attendance_by === null
-                  ? "-"
-                  : attendance.attendance_by}
-              </TableCell>
+      <div className="px-2 pt-4">
+        <Table className="[&_th]:text-center [&_th]:text-white text-center rounded-xl overflow-hidden">
+          <TableHeader className="bg-amber-400">
+            <TableRow>
+              <TableHead>Date</TableHead>
+              <TableHead>Check In At</TableHead>
+              <TableHead>check Out At</TableHead>
+              <TableHead>Work Hour</TableHead>
+              <TableHead>Late Minutes</TableHead>
+              <TableHead>Overtime (Hours)</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Attendance By</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody className="bg-amber-100">
+            {attendanceList.map((attendance) => (
+              <TableRow key={attendance.attendance_id}>
+                <TableCell>
+                  {formatAttendanceDate(attendance.attendance_date)}
+                </TableCell>
+                <TableCell>
+                  {attendance.check_in_at === null
+                    ? "-"
+                    : TimeFormat(attendance.check_in_at)}
+                </TableCell>
+                <TableCell>
+                  {attendance.check_out_at === null
+                    ? "-"
+                    : TimeFormat(attendance.check_out_at)}
+                </TableCell>
+                <TableCell>
+                  {attendance.check_out_at === null
+                    ? "-"
+                    : minutesToHm(attendance.hours_work_min)}
+                </TableCell>
+                <TableCell>
+                  {attendance.check_out_at === null
+                    ? "-"
+                    : attendance.late_minute}
+                </TableCell>
+                <TableCell>
+                  {attendance.check_out_at === null
+                    ? "-"
+                    : attendance.overtime_min}
+                </TableCell>
+                <TableCell>{attendance.attendance_status}</TableCell>
+                <TableCell>
+                  {attendance.attendance_by === null
+                    ? "-"
+                    : attendance.attendance_by}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

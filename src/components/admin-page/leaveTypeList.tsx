@@ -17,8 +17,8 @@ const LeaveTypeList = async () => {
   const leaveTypeList = await fetchLeaveType(session?.user.accessToken)
 
   return (
-    <Table className="text-center [&_th]:text-center">
-      <TableHeader>
+    <Table className="[&_th]:text-center [&_th]:text-white text-center rounded-xl overflow-hidden">
+      <TableHeader className="bg-amber-400">
         <TableRow>
           <TableHead>#</TableHead>
           <TableHead>Type</TableHead>
@@ -27,7 +27,7 @@ const LeaveTypeList = async () => {
           <TableHead>Action</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody className="bg-amber-100">
         {leaveTypeList.map((leaveType, index: number) => (
           <TableRow key={leaveType.leave_type_id}>
             <TableCell>{index + 1}</TableCell>

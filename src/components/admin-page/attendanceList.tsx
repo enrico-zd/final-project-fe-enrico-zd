@@ -23,8 +23,8 @@ const AttendanceList = async ({
   const attendanceList = await fetchAttendanceCompany(companyId, token);
   console.log(attendanceList)
   return (
-    <Table className="text-center [&_th]:text-center">
-      <TableHeader>
+    <Table className="[&_th]:text-center [&_th]:text-white text-center rounded-xl overflow-hidden">
+      <TableHeader className="bg-amber-400">
         <TableRow>
           <TableHead></TableHead>
           <TableHead>No</TableHead>
@@ -36,7 +36,7 @@ const AttendanceList = async ({
           <TableHead>Late</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>
+      <TableBody className="bg-amber-100">
         {attendanceList.map((attendance, index: number) => (
           <TableRow key={index}>
             <TableCell>

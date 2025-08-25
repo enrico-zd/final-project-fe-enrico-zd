@@ -53,10 +53,10 @@ const RealtimeClock = ({
 
   return (
     <div className="flex flex-col items-center">
-        <div>
+        <div className="text-4xl font-semibold">
             {time}
         </div>
-        <div>
+        <div className="font-semibold">
             {date}
         </div>
     </div>

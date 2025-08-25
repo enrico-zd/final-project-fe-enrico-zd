@@ -124,7 +124,7 @@ const UserForm = ({
               shiftData={shiftData}
               modes={modes}
             />
-            <button type="submit" className="btn">
+            <button type="submit" className="mt-2 py-2 sm:col-span-0 xl:col-span-2 justify-self-center flex justify-center w-[200px] rounded-sm text-white bg-amber-400 hover:bg-amber-500">
               {action} User
             </button>
           </form>
@@ -155,14 +155,14 @@ function PersonalDetails({
         <Field label="NIK">
           <input
             defaultValue={modes === "edit" ? userData.nik : ""}
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("user.nik")}
           />
         </Field>
         <Field label="Family Card Number">
           <input
             defaultValue={modes === "edit" ? userData.family_card_number : ""}
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("user.family_card_number")}
           />
         </Field>
@@ -170,14 +170,14 @@ function PersonalDetails({
         <Field label="Employment Number">
           <input
             defaultValue={modes === "edit" ? userData.employment_number : ""}
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("user.employment_number")}
           />
         </Field>
         <Field label="Passport Number">
           <input
             defaultValue={modes === "edit" ? userData.passport_number : ""}
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("user.passport_number")}
           />
         </Field>
@@ -185,14 +185,14 @@ function PersonalDetails({
         <Field label="Name">
           <input
             defaultValue={modes === "edit" ? userData.name : ""}
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("user.name", { required: true })}
           />
         </Field>
         <Field label="Address">
           <input
             defaultValue={modes === "edit" ? userData.address : ""}
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("user.address")}
           />
         </Field>
@@ -200,7 +200,7 @@ function PersonalDetails({
         <Field label="Email">
           <input
             defaultValue={modes === "edit" ? userData.email : ""}
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             type="email"
             {...register("user.email", { required: true })}
           />
@@ -208,7 +208,7 @@ function PersonalDetails({
         <Field label="Phone Number">
           <input
             defaultValue={modes === "edit" ? userData.phone_number : ""}
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("user.phone_number")}
           />
         </Field>
@@ -220,7 +220,7 @@ function PersonalDetails({
                 ? format(parseISO(userData.date_of_birth), "yyyy-MM-dd")
                 : ""
             }
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             type="date"
             {...register("user.date_of_birth", { valueAsDate: true })}
           />
@@ -229,14 +229,14 @@ function PersonalDetails({
         <Field label="Username">
           <input
             defaultValue={modes === "edit" ? userData.username : ""}
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("user.username", { required: true })}
           />
         </Field>
 
         <Field label="Avatar (file name only)">
           <input
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             // defaultValue={modes === "edit" ? userd : ""}
             type="file"
             onChange={(e) => {
@@ -250,7 +250,7 @@ function PersonalDetails({
         <Field label="Role">
           <select
             defaultValue=""
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("user.role", { required: true })}
           >
             <option value="" disabled>
@@ -284,7 +284,7 @@ function CompanyDetails({
       <div className="grid grid-cols-2 gap-3">
         <Field label="Company">
           <select
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             defaultValue={""}
             {...register("employment.company_id", {
               required: true,
@@ -305,7 +305,7 @@ function CompanyDetails({
             defaultValue={
               modes === "edit" ? userCompanyDetail.employee_type : ""
             }
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("employment.employee_type", { required: true })}
           >
             <option value={EmployeeType.Permanent}>Permanent</option>
@@ -317,7 +317,7 @@ function CompanyDetails({
         <Field label="User Type">
           <select
             defaultValue={modes === "edit" ? userCompanyDetail.user_type : ""}
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("employment.user_type", { required: true })}
           >
             <option value={UserType.Field}>Field</option>
@@ -328,7 +328,7 @@ function CompanyDetails({
         <Field label="Workspace">
           <select
             defaultValue={modes === "edit" ? userCompanyDetail.workspace : ""}
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("employment.workspace", { required: true })}
           >
             <option value={WorkSpace.Office}>Office</option>
@@ -346,7 +346,7 @@ function CompanyDetails({
                   )
                 : ""
             }
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             type="date"
             {...register("employment.joining_date", { required: true })}
           />
@@ -362,7 +362,7 @@ function CompanyDetails({
                   )
                 : ""
             }
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             type="date"
             {...register("employment.leaving_date")}
           />
@@ -370,7 +370,7 @@ function CompanyDetails({
 
         <Field label="Shift">
           <select
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             defaultValue=""
             {...register("employment.shift_id", {
               required: true,
@@ -392,7 +392,7 @@ function CompanyDetails({
 
         <Field label="Status">
           <select
-            className="input"
+            className="bg-amber-50 p-1 rounded-sm"
             {...register("employment.user_status", { required: true })}
           >
             <option value={StatusActive.Active}>Active</option>

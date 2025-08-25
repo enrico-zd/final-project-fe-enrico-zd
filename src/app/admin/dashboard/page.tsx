@@ -1,18 +1,28 @@
 "use client";
 import ChartEmployeeSumarry from "@/components/chart-employee-sumarry";
+import NavBread from "@/components/nav-bread";
 import SectionCard from "@/components/section-card";
 import { ageInYears, parseDobDF } from "@/lib/birthCount";
 import { fetchAllUserCompany } from "@/services/UserAPI";
 import { IError, IUserCompanyDetail } from "@/types/interface";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function DashboardAdmin() {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   const [userData, setUserData] = useState<IUserCompanyDetail[]>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<IError | null>(null);
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role === "STAFF") {
+      router.replace("/staff/dashboard");
+      return;
+    }
+  }, [session, status, router]);
 
   useEffect(() => {
     if (status !== "authenticated" || !session?.user.accessToken) return;
@@ -78,10 +88,11 @@ export default function DashboardAdmin() {
   console.log(error);
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 justify-center">
       {isLoading && <h1>Loading....</h1>}
-      <div className="self-start ml-6">
-        <h1 className="text-4xl">Dashboard</h1>
+      <div className="self-start">
+        <NavBread currentPage="#" />
+        <h1 className="text-4xl text-amber-700 ml-6">Dashboard</h1>
       </div>
       <div>
         <SectionCard totalUser={userData?.length} />

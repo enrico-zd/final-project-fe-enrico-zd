@@ -11,7 +11,7 @@ export default function StaffLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="w-full h-screen flex justify-center bg-gradient-to-br from-amber-300  to-amber-600">
+    <main className="w-full flex justify-center bg-gradient-to-br from-amber-300  to-amber-600">
       {children}
     </main>
   );
