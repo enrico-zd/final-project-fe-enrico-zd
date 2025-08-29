@@ -39,7 +39,7 @@ export enum WorkSpace {
 
 export enum PaidLeave {
   Yes = "YES",
-  No = "No",
+  No = "NO",
 }
 
 export enum AttendanceStatus {
@@ -103,7 +103,6 @@ export interface ICompany {
   npwp: string;
   payroll_date: number;
   status: StatusActive;
-  general_holiday: Holiday;
   image_company: string;
 }
 
@@ -160,12 +159,25 @@ export interface IShift {
   status: StatusActive;
 }
 
+export interface ICreateUpdateShift {
+  title: string;
+  opening_time: string;
+  closing_time: string;
+  status: StatusActive;
+}
+
 // leave type interface
 export interface ILeaveType {
   leave_type_id: number;
   leave_type_name: string;
   paid_leave: PaidLeave;
   leave_allocated_day: number;
+}
+
+export interface ICreateUpdateLeaveType {
+  leave_type_name: string;
+  paid_leave: PaidLeave;
+  leave_allocated_day: number | null;
 }
 
 export interface ILeaveRequest {
@@ -178,6 +190,7 @@ export interface ILeaveRequest {
   user: IUser;
   requested_days: number;
   reason: string;
+  proof_image: string;
   approver: IUser;
   approved_at: string;
   admin_remark: string;
@@ -190,6 +203,10 @@ export interface ICreateLeaveRequest {
   to: string;
   reason: string;
   proof_image: string;
+}
+export interface IApprovedLeaveRequest {
+  status: StatusApproval;
+  admin_remark: string;
 }
 
 export interface ITimeAndDate {

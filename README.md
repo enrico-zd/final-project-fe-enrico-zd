@@ -1,36 +1,130 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Final Project FE - Enrico Zada
 
-## Getting Started
+Human Resource Management System (HRMS) web application built with **Next.js**, **TypeScript**, **TailwindCSS**, and **Shadcn UI**.  
+This application helps manage employee attendance, leave requests, company details, and more — with separate dashboards for **Admin** and **Staff**.
 
-First, run the development server:
+---
+
+## 🚀 Features
+
+### 🔑 Authentication
+
+- Login & Register pages
+- Role-based access (Admin / Staff)
+- Middleware route protection
+
+### 👨‍💼 Admin Module
+
+- **Dashboard**: Overview of company stats
+- **Attendance**: Manage & monitor employee attendance
+- **Company**: Company profile & configuration
+- **Leave**: Approve/reject leave requests
+- **Shift**: Manage shift schedules
+- **Users**: Manage employee accounts
+
+### 👷 Staff Module
+
+- **Dashboard**: Personal attendance overview
+- **Attendance**: Check-in / Check-out system
+- **Leave**: Submit leave requests
+- **Profile**: Update personal information
+
+---
+
+## 📂 Project Structure
+
+```bash
+final-project-fe-enrico-zd/
+├── src/
+│   ├── app/                          # Next.js App Router pages
+│   │   ├── admin/                    # Admin routes
+│   │   │   ├── attendance/
+│   │   │   ├── company/
+│   │   │   ├── dashboard/
+│   │   │   ├── leave/
+│   │   │   ├── shift/
+│   │   │   └── users/
+│   │   │
+│   │   ├── staff/                    # Staff routes
+│   │   │   ├── attendance/
+│   │   │   ├── dashboard/
+│   │   │   ├── leave/
+│   │   │   └── profile/
+│   │   │
+│   │   ├── api/                      # API Routes (serverless functions)
+│   │   │   ├── auth/                 # Authentication routes
+│   │   │   └── uploadthing/          # File upload handling (UploadThing
+│   │   │
+│   │   ├── login/                    # Auth login page
+│   │   ├── register/                 # Auth register page
+│   │   ├── layout.tsx                # Root layout
+│   │   └── page.tsx                  # Landing page
+│   │
+│   ├── components/                   # Reusable UI components
+│   ├── hooks/                        # Custom React hooks
+│   ├── lib/                          # Utility libraries (date, time, formatting, etc.)
+│   ├── providers/                    # Context providers (e.g., AuthProvider)
+│   ├── services/                     # API service functions (fetch wrappers)
+│   ├── types/                        # TypeScript interfaces & enums
+│   └── utils/                        # Extra utility/helper functions
+│
+├── middleware.ts                     # NextAuth / route middleware
+├── .env.local                        # Environment variables
+└── package.json
+
+```
+
+---
+
+## 🛠️ Tech Stack
+
+- [Next.js](https://nextjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Shadcn UI](https://ui.shadcn.com/)
+- [NextAuth.js](https://next-auth.js.org/) – Authentication
+- [Lucide React](https://lucide.dev/) – Icons
+
+---
+
+## ⚙️ Setup & Installation
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/enrico-zd/final-project-fe-enrico-zd.git
+cd final-project-fe-enrico-zd
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+```
+
+### 3. Setup Environment
+
+```bash
+NEXTAUTH_SECRET=your-secret
+NEXTAUTH_URL=http://localhost:3000
+API_URL=http://localhost:5000
+```
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🌐 Live Demo
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Admin Dashboard Screenshot
+<img src="./public/hrms-admin-dashboard.png" alt="Admin Dashboard" width="600" style="margin:auto; display:block;"/>
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Staff Dashboard Screenshot
+<img src="./public/hrms-staff-dashboard.png" alt="Staff Dashboard" width="600" style="margin:auto; display:block;"/>
+<br/>
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+👉 [Live Demo on Vercel](https://final-project-fe-enrico-zd.vercel.app/)

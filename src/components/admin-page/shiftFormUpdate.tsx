@@ -2,22 +2,21 @@
 
 import { SubmitHandler, useForm } from "react-hook-form";
 import {
+  ICreateUpdateShift,
   IError,
   IShift,
-  IUserCompanyDetail,
   StatusActive,
 } from "@/types/interface";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { fetchShiftById } from "@/services/ShiftAPI";
-import { fetchUserCompanyById } from "@/services/UserAPI";
+import { fetchShiftById, fetchUpdateShift } from "@/services/ShiftAPI";
 import { TimeFormat } from "@/lib/timeFormating";
 
 const ShiftFormUpdate = ({ id, modes }: { id?: number; modes: string }) => {
   const { data: session, status } = useSession();
 
   const [shiftData, setShiftData] = useState<IShift | null>(null);
-  const [dataUser, setDataUser] = useState<IUserCompanyDetail | null>(null);
+  const [success, setSuccess] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<IError | null>(null);
 
@@ -33,12 +32,8 @@ const ShiftFormUpdate = ({ id, modes }: { id?: number; modes: string }) => {
       try {
         setIsLoading(true);
         setError(null);
-
-        const user = await fetchUserCompanyById(userId, accessToken);
         const shift = await fetchShiftById(id, accessToken);
-
         if (!cancelled) {
-          setDataUser(user);
           setShiftData(shift);
         }
       } catch (err) {
@@ -60,45 +55,50 @@ const ShiftFormUpdate = ({ id, modes }: { id?: number; modes: string }) => {
     };
   }, [status, session?.user.user_id, session?.user.accessToken, id]);
 
-  console.log(error);
-
   const action =
     modes === "create" ? "Create" : modes === "update" ? "Update" : "";
 
   const { register, handleSubmit } = useForm<IShift>();
-  const onSubmit: SubmitHandler<IShift> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<ICreateUpdateShift> = async (data) => {
+    const openingTime = `1970-01-01T${data.opening_time}.000Z`;
+    const closingTime = `1970-01-01T${data.closing_time}.000Z`;
+
+    const payload = {
+      ...data,
+      opening_time: openingTime,
+      closing_time: closingTime,
+    };
+
+    setError(null);
+    try {
+      setSuccess("");
+      setIsLoading(true);
+      await fetchUpdateShift(id, session?.user.accessToken, payload);
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setSuccess("Berhasil Update Shift");
+      setIsLoading(false);
+    }
+  };
 
   if (!shiftData) return;
 
   return (
     <div className="flex flex-col items-center gap-4">
+      {error && <h1>{error.message}</h1>}
       {isLoading && <h1>Loading...</h1>}
+      {success && <h1>{success}</h1>}
       <div className="bg-amber-200 w-[96%] px-6 py-4 h-full rounded-sm">
         <h1 className="text-2xl text-amber-800">Office Time</h1>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="grid grid-cols-2 gap-3 mt-4"
         >
-          <div className="flex flex-col gap-2">
-            <label htmlFor="company" className="text-amber-800 text-lg">
-              Company Name
-            </label>
-            <select
-              className="bg-amber-50 p-1 rounded-sm"
-              defaultValue={""}
-              {...register("company_id", {
-                required: true,
-                valueAsNumber: true,
-              })}
-            >
-              <option value="" disabled>
-                — Select Company —
-              </option>
-              <option value={dataUser?.company_id}>
-                {dataUser?.company.company_name}
-              </option>
-            </select>
-          </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="title" className="text-amber-800 text-lg">
               Title
@@ -108,38 +108,6 @@ const ShiftFormUpdate = ({ id, modes }: { id?: number; modes: string }) => {
               type="text"
               id="title"
               defaultValue={modes === "update" ? shiftData.title : ""}
-              className="bg-amber-50 p-1 rounded-sm"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="opening_time" className="text-amber-800 text-lg">
-              Opening Time
-            </label>
-            <input
-              {...register("opening_time", { required: true })}
-              type="time"
-              id="opening_time"
-              defaultValue={
-                modes === "update" && shiftData.opening_time !== null
-                  ? TimeFormat(shiftData.opening_time)
-                  : ""
-              }
-              className="bg-amber-50 p-1 rounded-sm"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="closing_time" className="text-amber-800 text-lg">
-              Opening Time
-            </label>
-            <input
-              {...register("closing_time", { required: true })}
-              type="time"
-              id="closing_time"
-              defaultValue={
-                modes === "update" && shiftData.closing_time !== null
-                  ? TimeFormat(shiftData.closing_time)
-                  : ""
-              }
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -161,6 +129,43 @@ const ShiftFormUpdate = ({ id, modes }: { id?: number; modes: string }) => {
               <option value={StatusActive.Inactive}>Inactive</option>
             </select>
           </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="opening_time" className="text-amber-800 text-lg">
+              Opening Time
+            </label>
+            <input
+              {...register("opening_time", {
+                required: true,
+              })}
+              type="time"
+              step={1}
+              id="opening_time"
+              defaultValue={
+                modes === "update" && shiftData.opening_time !== null
+                  ? TimeFormat(shiftData.opening_time)
+                  : ""
+              }
+              className="bg-amber-50 p-1 rounded-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="closing_time" className="text-amber-800 text-lg">
+              Opening Time
+            </label>
+            <input
+              {...register("closing_time", { required: true })}
+              type="time"
+              step={1}
+              id="closing_time"
+              defaultValue={
+                modes === "update" && shiftData.closing_time !== null
+                  ? TimeFormat(shiftData.closing_time)
+                  : ""
+              }
+              className="bg-amber-50 p-1 rounded-sm"
+            />
+          </div>
+
           <div className="mt-2 py-2 col-span-2 justify-self-center flex justify-center w-[200px] rounded-sm text-white bg-amber-400 hover:bg-amber-500">
             <input type="submit" value={`${action} Shift`} />
           </div>

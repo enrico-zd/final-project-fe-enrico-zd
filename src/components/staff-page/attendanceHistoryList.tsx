@@ -53,7 +53,6 @@ const AttendHistoryList = () => {
     };
   }, [status, session?.user.accessToken]);
 
-  console.log(attendance);
 
   return (
     <div>

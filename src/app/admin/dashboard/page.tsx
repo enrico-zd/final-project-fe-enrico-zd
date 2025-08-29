@@ -85,17 +85,21 @@ export default function DashboardAdmin() {
     .map(([age, count]) => ({ age: Number(age), count }))
     .sort((a, b) => a.age - b.age);
 
-  console.log(error);
-
   return (
     <div className="flex flex-col items-center gap-4 justify-center">
+      {error && <h1>{error.message}</h1>}
       {isLoading && <h1>Loading....</h1>}
       <div className="self-start">
         <NavBread currentPage="#" />
         <h1 className="text-4xl text-amber-700 ml-6">Dashboard</h1>
       </div>
       <div>
-        <SectionCard totalUser={userData?.length} />
+        <SectionCard
+          totalUser={userData?.length}
+          userId={session?.user.user_id}
+          token={session?.user.accessToken}
+          statusAuth={status}
+        />
       </div>
       <div>
         <ChartEmployeeSumarry

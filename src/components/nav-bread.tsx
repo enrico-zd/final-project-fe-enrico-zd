@@ -15,10 +15,8 @@ export default function NavBread({
   prevPath,
 }: {
   currentPage: string;
-  prevPath?: {path: string, name: string};
+  prevPath?: { path: string; name: string };
 }) {
-
-  console.log(prevPath)
   return (
     <div className="flex items-center text-sm">
       {/* sidebar trigger */}

@@ -3,12 +3,12 @@ import NavBread from "@/components/nav-bread";
 import AttendanceList from "@/components/admin-page/attendanceList";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { fetchUserCompanyById } from "@/services/UserAPI";
+import { fetchUserCompanyByUserId } from "@/services/UserAPI";
 
 export default async function Attendance() {
   const session = await getServerSession(authOptions)
 
-  const users = await fetchUserCompanyById(session?.user.user_id, session?.user.accessToken)
+  const users = await fetchUserCompanyByUserId(session?.user.user_id, session?.user.accessToken)
   
   return (
     <div>

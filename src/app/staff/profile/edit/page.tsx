@@ -97,12 +97,10 @@ const EditProfile = () => {
         </div>
         <div className="flex flex-col items-center gap-4">
           <div className="bg-amber-200 w-[96%] px-6 py-4 h-full rounded-sm">
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
               {error ? (
                 <div>
                   <p>{error.message}</p>
-                  <p>{error.name}</p>
-                  <p>{error.code}</p>
                 </div>
               ) : (
                 success && (
@@ -209,7 +207,7 @@ const EditProfile = () => {
                 </div>
               </div>
 
-              <div className="mt-6 py-2 col-span-2 justify-self-center flex justify-center w-[200px] rounded-sm text-white bg-amber-400 hover:bg-amber-500">
+              <div className="mt-6 py-2 w-full justify-self-center flex justify-center w-[200px] rounded-sm text-white bg-amber-400 hover:bg-amber-500">
                 <input type="submit" value={`Update Profile`} />
               </div>
             </form>
