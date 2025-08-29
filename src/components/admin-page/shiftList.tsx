@@ -10,11 +10,10 @@ import {
   TableRow,
 } from "../ui/table";
 import { IError, IShift } from "@/types/interface";
-import { fetchShift } from "@/services/ShiftAPI";
+import { fetchDeleteShift, fetchShift } from "@/services/ShiftAPI";
 import Link from "next/link";
-import { SquarePen } from "lucide-react";
+import { Delete, SquarePen } from "lucide-react";
 import { TimeFormat } from "@/lib/timeFormating";
-
 const ShiftList = ({
   token,
   statusAuth,
@@ -24,6 +23,7 @@ const ShiftList = ({
 }) => {
   const [shiftData, setShiftData] = useState<IShift[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<IError | null>(null);
 
   useEffect(() => {
@@ -60,10 +60,33 @@ const ShiftList = ({
     };
   }, [statusAuth, token]);
 
-  console.log(error);
+  const handleDelete = async (shiftId: number) => {
+    setIsLoading(false);
+    setError(null);
+    setSuccess("");
+    try {
+      await fetchDeleteShift(shiftId, token);
+      const shift = await fetchShift(token);
+      setShiftData(shift);
+      setSuccess("Berhasil Hapus Shift");
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setTimeout(() => {
+        setSuccess("");
+      }, 1000);
+    }
+  };
+
   return (
     <div className="px-2">
+      {error && <h1>{error.message}</h1>}
       {isLoading && <h1>Loading...</h1>}
+      {success && <h1>{success}</h1>}
       <Table className="[&_th]:text-center [&_th]:text-white text-center rounded-xl overflow-hidden">
         <TableHeader className="bg-amber-400">
           <TableRow>
@@ -83,11 +106,22 @@ const ShiftList = ({
               <TableCell>{TimeFormat(shift.opening_time)}</TableCell>
               <TableCell>{TimeFormat(shift.closing_time)}</TableCell>
               <TableCell>{shift.status}</TableCell>
-              <TableCell className="flex justify-center">
+              <TableCell className="flex justify-center gap-2 items-center">
                 <div>
                   <Link href={`./shift/update/${shift.shift_id}`}>
                     <SquarePen />
                   </Link>
+                </div>
+                <div>
+                  <button
+                    onClick={() => {
+                      if (confirm("Yakin untuk hapus shift ini?")) {
+                        handleDelete(shift.shift_id);
+                      }
+                    }}
+                  >
+                    <Delete className="text-red-500" />
+                  </button>
                 </div>
               </TableCell>
             </TableRow>

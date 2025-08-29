@@ -11,6 +11,8 @@ import { authOptions } from "@/lib/auth";
 import { fetchLeaveRequest } from "@/services/LeaveRequest";
 import { format, parseISO } from "date-fns";
 import { TimeFormat } from "@/lib/timeFormating";
+import { LeaveRequestReason } from "./leaveRequestReason";
+import { LeaveRequestApproval } from "./leaveRequestApproval";
 
 const LeaveList = async () => {
   const session = await getServerSession(authOptions);
@@ -44,11 +46,19 @@ const LeaveList = async () => {
             <TableCell>{formatRequestDate(leave.request_date)}</TableCell>
             <TableCell>{leave.user.name}</TableCell>
             <TableCell>{leave.requested_days}</TableCell>
-            <TableCell>{leave.reason}</TableCell>
+            <TableCell>
+              <div className="flex justify-center text-amber-600">
+                <LeaveRequestReason
+                  reason={leave.reason}
+                  adminRemark={leave.admin_remark}
+                  proofImage={leave.proof_image}
+                />
+              </div>
+            </TableCell>
             <TableCell className="whitespace-pre-line">
               {leave.approver === null
                 ? "-"
-                : `${leave.user.name}\n(${leave.user.role})`}
+                : `${leave.approver.name}\n(${leave.approver.role})`}
             </TableCell>
             <TableCell>
               {leave.approved_at === null
@@ -57,7 +67,16 @@ const LeaveList = async () => {
               {<br />}
               {leave.approved_at === null ? "-" : TimeFormat(leave.approved_at)}
             </TableCell>
-            <TableCell>{leave.status}</TableCell>
+            <TableCell>
+              <div className="flex justify-center text-amber-600">
+                <LeaveRequestApproval
+                  accessToken={session?.user.accessToken}
+                  leaveId={leave.leave_request_id}
+                  status={leave.status}
+                  adminRemark={leave.admin_remark}
+                />
+              </div>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>

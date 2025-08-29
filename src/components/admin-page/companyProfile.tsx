@@ -1,18 +1,57 @@
 "use client";
-import NavBread from "@/components/nav-bread"
-import { ICompany, StatusActive } from "@/types/interface"
-import { SubmitHandler, useForm } from "react-hook-form"
+import NavBread from "@/components/nav-bread";
+import { fetchUpdateCompany } from "@/services/CompanyApi";
+import { ICompany, IError, StatusActive } from "@/types/interface";
+import { UploadButton } from "@/utils/uploadthing";
+import { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 export default function CompanyProfile({
-  companyData
+  companyData,
+  accessToken,
 }: {
   companyData: ICompany | null;
+  accessToken: string | undefined;
 }) {
-  const { register, handleSubmit } = useForm<ICompany>();
-  const onSubmit: SubmitHandler<ICompany> = (data) => console.log(data);
+  const [error, setError] = useState<IError | null>(null);
+  const [success, setSuccess] = useState<string>("");
 
-  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-  console.log(companyData?.company_name)
+  const { register, handleSubmit, reset, setValue } = useForm<ICompany>();
+
+  useEffect(() => {
+    if (companyData) {
+      reset({
+        company_name: companyData.company_name,
+        company_owner: companyData.company_owner,
+        company_address: companyData.company_address,
+        company_email: companyData.company_email,
+        company_phone: companyData.company_phone,
+        web_url: companyData.web_url,
+        npwp: companyData.npwp,
+        payroll_date: companyData.payroll_date,
+        status: companyData.status,
+        image_company: companyData.image_company,
+      });
+    }
+  }, [companyData, reset]);
+
+  const onSubmit: SubmitHandler<ICompany> = async (data) => {
+    setError(null);
+
+    try {
+      setSuccess("");
+      await fetchUpdateCompany(accessToken, data);
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setSuccess("Update Berhasil");
+    }
+  };
+
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="self-start">
@@ -20,6 +59,17 @@ export default function CompanyProfile({
       </div>
       <div className="bg-amber-200 w-[98%] px-6 py-4 h-full rounded-sm">
         <h1 className="text-4xl text-amber-800">Company Profile</h1>
+        {error ? (
+          <div>
+            <p>{error.message}</p>
+          </div>
+        ) : (
+          success && (
+            <div>
+              <p>{success}</p>
+            </div>
+          )
+        )}
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="grid grid-cols-2 gap-3 mt-4"
@@ -32,7 +82,6 @@ export default function CompanyProfile({
               {...register("company_name", { required: true })}
               type="text"
               id="company_name"
-              defaultValue={companyData?.company_name}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -44,7 +93,6 @@ export default function CompanyProfile({
               {...register("company_owner", { required: true })}
               type="text"
               id="company_owner"
-              defaultValue={companyData?.company_owner}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -56,7 +104,6 @@ export default function CompanyProfile({
               {...register("company_address", { required: true })}
               type="text"
               id="address"
-              defaultValue={companyData?.company_address}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -68,7 +115,6 @@ export default function CompanyProfile({
               {...register("company_email", { required: true })}
               type="email"
               id="email"
-              defaultValue={companyData?.company_email}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -80,7 +126,6 @@ export default function CompanyProfile({
               {...register("company_phone", { required: true })}
               type="text"
               id="phone_number"
-              defaultValue={companyData?.company_phone}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -92,7 +137,6 @@ export default function CompanyProfile({
               {...register("web_url", { required: false })}
               type="text"
               id="web_url"
-              defaultValue={companyData?.web_url}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -104,7 +148,6 @@ export default function CompanyProfile({
               {...register("npwp", { required: false })}
               type="text"
               id="npwp"
-              defaultValue={companyData?.npwp}
               className="bg-amber-50 p-1 rounded-sm"
             />
           </div>
@@ -116,23 +159,8 @@ export default function CompanyProfile({
               {...register("payroll_date", { required: true, min: 1, max: 31 })}
               type="number"
               id="payroll_date"
-              defaultValue={companyData?.payroll_date}
               className="bg-amber-50 p-1 rounded-sm"
             />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-amber-800 text-xl">General Holiday</label>
-            {days.map((day) => (
-              <label key={day} className="flex items-center gap-1">
-                <input
-                  {...register("general_holiday", { required: false })}
-                  type="checkbox"
-                  value={day}
-                  className="accent-amber-500"
-                />
-                {day}
-              </label>
-            ))}
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="status" className="text-amber-800 text-xl">
@@ -142,7 +170,6 @@ export default function CompanyProfile({
               {...register("status", { required: true })}
               name="status"
               id="status"
-              defaultValue={companyData?.status}
               className="bg-amber-50 p-1 rounded-sm"
             >
               <option value="" disabled>
@@ -153,13 +180,26 @@ export default function CompanyProfile({
             </select>
           </div>
           <div className="flex flex-col gap-2">
-            <label htmlFor="" className="text-amber-800 text-xl">
+            <label htmlFor="image_company" className="text-amber-800 text-xl">
               Upload Logo
             </label>
-            <input
-              {...register("image_company")}
-              type="file"
-              className="bg-amber-50 p-1 rounded-sm"
+            <UploadButton
+              appearance={{
+                button:
+                  "ut-ready:bg-amber-500 ut-uploading:cursor-not-allowed rounded-r-none bg-red-500 bg-none after:bg-orange-400 w-24",
+                container:
+                  "w-max flex-row rounded-md border-cyan-300 bg-slate-800",
+                allowedContent:
+                  "flex h-8 flex-col items-center justify-center px-2 text-white",
+              }}
+              endpoint="imageUploader"
+              onClientUploadComplete={(res) => {
+                setValue("image_company", res[0].ufsUrl);
+                alert("Upload Completed");
+              }}
+              onUploadError={(error: Error) => {
+                alert(`ERROR! ${error.message}`);
+              }}
             />
           </div>
           <div className="mt-2 py-2 col-span-2 justify-self-center flex justify-center w-[200px] rounded-sm text-white bg-amber-400 hover:bg-amber-500">

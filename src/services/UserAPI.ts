@@ -1,3 +1,4 @@
+import { FormDataUserDetail } from "@/components/admin-page/UserForm";
 import { IUpdateUser, IUser, IUserCompanyDetail } from "@/types/interface";
 
 // === user ===
@@ -43,6 +44,36 @@ export const fetchUpdateUser = async (
   return response.json();
 };
 
+export const fetchDeleteUser = async (
+  userId: number | undefined,
+  accessToken: string | undefined
+): Promise<IUser> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL!}/users/${userId}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    let detail = null;
+    try {
+      detail = await response.json();
+    } catch {}
+    const msg =
+      detail?.message && Array.isArray(detail.message)
+        ? detail.message.join(", ")
+        : detail?.message || "Failed to update user";
+    throw new Error(`${response.status} ${response.statusText} - ${msg}`);
+  }
+
+  return response.json();
+};
+
 // === user company detail ===
 export const fetchUserCompanyById = async (
   id: number | undefined,
@@ -50,6 +81,28 @@ export const fetchUserCompanyById = async (
 ): Promise<IUserCompanyDetail> => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL!}/user-company-detail/${id}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("failed to fetch data user");
+  }
+
+  return response.json();
+};
+
+export const fetchUserCompanyByUserId = async (
+  id: number | undefined,
+  accessToken: string | undefined
+): Promise<IUserCompanyDetail> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL!}/user-company-detail/employee/${id}`,
     {
       method: "GET",
       headers: {
@@ -82,6 +135,69 @@ export const fetchAllUserCompany = async (
 
   if (!response.ok) {
     throw new Error("failed to fetch data user");
+  }
+
+  return response.json();
+};
+
+export const fetchUpdateUserDetail = async (
+  user_company_id: number | undefined,
+  accessToken: string | undefined,
+  data: FormDataUserDetail
+): Promise<IUserCompanyDetail> => {
+  const response = await fetch(
+    `${process.env
+      .NEXT_PUBLIC_API_URL!}/user-company-detail/${user_company_id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!response.ok) {
+    let detail = null;
+    try {
+      detail = await response.json();
+    } catch {}
+    const msg =
+      detail?.message && Array.isArray(detail.message)
+        ? detail.message.join(", ")
+        : detail?.message || "Failed to update user";
+    throw new Error(`${response.status} ${response.statusText} - ${msg}`);
+  }
+
+  return response.json();
+};
+export const fetchCreateUserDetail = async (
+  accessToken: string | undefined,
+  data: FormDataUserDetail
+): Promise<IUserCompanyDetail> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL!}/user-company-detail/create`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!response.ok) {
+    let detail = null;
+    try {
+      detail = await response.json();
+    } catch {}
+    const msg =
+      detail?.message && Array.isArray(detail.message)
+        ? detail.message.join(", ")
+        : detail?.message || "Failed to update user";
+    throw new Error(`${response.status} ${response.statusText} - ${msg}`);
   }
 
   return response.json();

@@ -7,8 +7,8 @@ import {
   TableRow,
 } from "../ui/table";
 import Link from "next/link";
-import { Eye, SquarePen } from "lucide-react";
-import { fetchAllUserCompany } from "@/services/UserAPI";
+import { Delete, Eye, SquarePen } from "lucide-react";
+import { fetchAllUserCompany, fetchDeleteUser } from "@/services/UserAPI";
 import { IError, IUserCompanyDetail } from "@/types/interface";
 import { useEffect, useState } from "react";
 
@@ -21,6 +21,7 @@ const UserList = ({
 }) => {
   const [dataUsers, setDataUsers] = useState<IUserCompanyDetail[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<IError | null>(null);
 
   useEffect(() => {
@@ -57,10 +58,32 @@ const UserList = ({
     };
   }, [statusAuth, token]);
 
-  console.log(error);
+  const handleDelete = async (userId: number) => {
+    setIsLoading(false);
+    setError(null);
+    setSuccess("");
+    try {
+      await fetchDeleteUser(userId, token);
+      const data = await fetchAllUserCompany(token);
+      setDataUsers(data);
+      setSuccess("Berhasil Hapus User");
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setTimeout(() => {
+        setSuccess("");
+      }, 1000);
+    }
+  };
 
   return (
     <div className="px-2">
+      {success && <h1>{success}</h1>}
+      {error && <h1>{error.message}</h1>}
       {isLoading ? (
         <h1>loading</h1>
       ) : (
@@ -82,7 +105,7 @@ const UserList = ({
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell className="flex justify-center">
-                  <Link href={`./users/${user.user_id}`}>
+                  <Link href={`./users/${user.user_company_id}`}>
                     <Eye />
                   </Link>
                 </TableCell>
@@ -91,10 +114,21 @@ const UserList = ({
                 <TableCell>{user.user.email}</TableCell>
                 <TableCell>{user.user.phone_number}</TableCell>
                 <TableCell>{user.user_status}</TableCell>
-                <TableCell className="flex justify-center">
-                  <Link href={`./users/update/${user.user_id}`}>
+                <TableCell className="flex justify-center gap-2 items-center">
+                  <Link href={`./users/update/${user.user_company_id}`}>
                     <SquarePen />
                   </Link>
+                  <div>
+                    <button
+                      onClick={() => {
+                        if (confirm("Yakin untuk hapus user ini?")) {
+                          handleDelete(user.user_id);
+                        }
+                      }}
+                    >
+                      <Delete className="text-red-500" />
+                    </button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

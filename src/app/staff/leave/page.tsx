@@ -26,7 +26,7 @@ export default function StaffLeave() {
   }, [session, status, router]);
 
   return (
-    <div className="shadow-amber-200 bg-amber-100 w-[375px]">
+    <div className="shadow-amber-200 h-screen bg-amber-100 w-[375px]">
       <div className="m-2 flex flex-row justify-between relative">
         <div className="flex flex-row gap-2 items-center">
           <div>

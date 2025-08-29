@@ -1,4 +1,3 @@
-import { Fingerprint } from "lucide-react";
 import RealtimeClock from "./realtimeClock";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -11,11 +10,11 @@ import {
 import { minutesToHm } from "@/lib/minutToHour";
 import { toISOStringNoMs } from "@/utils/toIsoStringNoMs";
 import { TimeFormat } from "@/lib/timeFormating";
+import { LogIn, LogOut } from "lucide-react";
 
 const ShiftTracker = () => {
   const { data: session, status } = useSession();
 
-  const [isCheckIn, setIsCheckin] = useState<boolean>(true);
   const [attendance, setAttendance] = useState<IAttendance>();
   const [error, setError] = useState<IError | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -61,24 +60,15 @@ const ShiftTracker = () => {
     check_out_at: formatted,
   });
 
-  const handleTap = async () => {
+  const handleCheckin = async () => {
     try {
       setIsLoading(true);
-      if (isCheckIn) {
-        await fetchCheckIn(
-          session?.user.user_id,
-          buildCheckInPayload(),
-          session?.user.accessToken
-        );
-        setIsCheckin(false); // setelah sukses check-in, pindah ke mode check-out
-      } else {
-        await fetchCheckOut(
-          session?.user.user_id,
-          buildCheckOutPayload(),
-          session?.user.accessToken
-        );
-        setIsCheckin(true); // setelah sukses check-out, balik ke mode check-in
-      }
+      const checkIn = await fetchCheckIn(
+        session?.user.user_id,
+        buildCheckInPayload(),
+        session?.user.accessToken
+      );
+      setAttendance(checkIn);
     } catch (err) {
       setError({
         message: err instanceof Error ? err.message : "Unknown error occured",
@@ -86,13 +76,37 @@ const ShiftTracker = () => {
         code: err instanceof Error ? 500 : undefined,
       });
     } finally {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+    }
+  };
+
+  const handleCheckOut = async () => {
+    try {
+      setIsLoading(true);
+      const checkOut = await fetchCheckOut(
+        session?.user.user_id,
+        buildCheckOutPayload(),
+        session?.user.accessToken
+      );
+      setAttendance(checkOut);
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
     }
   };
 
   if (!attendance) return;
   return (
-    <div className="flex flex-col w-[94%] items-center gap-4">
+    <div className="flex flex-col w-[92%] items-center gap-4">
       {error && (
         <div>
           <p>{error.message}</p>
@@ -103,42 +117,66 @@ const ShiftTracker = () => {
       <div>
         <RealtimeClock locale="en-US" timeZone="Asia/Jakarta" hour12={false} />
       </div>
-      <div className="flex flex-col items-center gap-2">
-        <div>
-          <button
-            onClick={handleTap}
-            disabled={isLoading}
-            className={`w-28 h-28 rounded-full flex justify-center items-center
-    ${
-      isLoading
-        ? "bg-amber-300 cursor-not-allowed"
-        : "bg-amber-400 hover:bg-amber-500"
-    }`}
-            title={isCheckIn ? "Check In" : "Check Out"}
-          >
-            <Fingerprint className="w-16 h-16" />
-          </button>
-        </div>
-        <div>
-          <p className="text-sm mt-2 text-gray-600">
-            Mode: <b>{isCheckIn ? "Check In" : "Check Out"}</b>
-          </p>
+      <div className="bg-amber-50 w-full flex flex-col items-center rounded-2xl ring-2 ring-amber-100 shadow-lg">
+        <div className="flex flex-row w-full justify-around p-2">
+          <div className="flex flex-col items-center">
+            <p className="font-semibold pb-1 text-lg">Check In</p>
+            {isLoading ? (
+              <p>00:00:00</p>
+            ) : (
+              <p className="font-semibold">
+                {attendance.check_in_at === null
+                  ? "--:--:--"
+                  : TimeFormat(attendance.check_in_at)}
+              </p>
+            )}
+            <div>
+              <button
+                onClick={handleCheckin}
+                disabled={!attendance.check_in_at ? false : true}
+                className={`
+                  ${
+                    !attendance.check_in_at
+                      ? "bg-amber-400 ring-1 hover:ring-2 ring-amber-400 hover:bg-amber-300 text-black/80 active:bg-amber-500"
+                      : "bg-amber-100 ring-2 ring-amber-200 text-black/30"
+                  } rounded-2xl py-1 px-6 my-2 flex items-center gap-1`}
+              >
+                <LogIn size={22} /> Check In
+              </button>
+            </div>
+          </div>
+          <div className="flex flex-col items-center">
+            <p className="font-semibold pb-1 text-lg">Check Out</p>
+
+            {isLoading ? (
+              <p>00:00:00</p>
+            ) : (
+              <p className="font-semibold">
+                {attendance.check_out_at === null
+                  ? "--:--:--"
+                  : TimeFormat(attendance.check_out_at)}
+              </p>
+            )}
+            <div>
+              <button
+                onClick={handleCheckOut}
+                disabled={!attendance.check_out_at ? false : true}
+                className={`
+                  ${
+                    !attendance.check_out_at
+                      ? "bg-amber-400 ring-1 hover:ring-2 ring-amber-400 hover:bg-amber-300 text-black/80 active:bg-amber-500"
+                      : "bg-amber-100 ring-1 ring-amber-200 text-black/30"
+                  } rounded-2xl py-1 px-6 my-2 flex items-center gap-1`}
+              >
+                <LogOut size={22} /> Check Out
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <div className="w-full">
-        <div className="flex flex-row justify-between">
-          <p>
-            {attendance.check_in_at === null
-              ? "00:00"
-              : TimeFormat(attendance.check_in_at)}
-          </p>
-          <p>
-            {attendance.check_out_at === null
-              ? "00:00"
-              : TimeFormat(attendance.check_out_at)}
-          </p>
-        </div>
-        <div className="bg-amber-400  text-center rounded-lg py-0.5">
+        <p className="text-center text-xl font-semibold pb-1">Working Hours</p>
+        <div className="bg-amber-400 text-center rounded-lg py-0.5  shadow-md">
           {attendance.check_out_at === null
             ? "0h 0m"
             : minutesToHm(attendance.hours_work_min)}

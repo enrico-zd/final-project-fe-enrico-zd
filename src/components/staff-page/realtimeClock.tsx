@@ -3,11 +3,7 @@
 import { ITimeAndDate } from "@/types/interface";
 import { useEffect, useRef, useState } from "react";
 
-const RealtimeClock = ({
-  locale,
-  timeZone,
-  hour12 = false,
-}: ITimeAndDate) => {
+const RealtimeClock = ({ locale, timeZone, hour12 = false }: ITimeAndDate) => {
   // render hanya di client agar tidak mismatch dengan SSR
   const [now, setNow] = useState<Date | null>(null);
   const timerRef = useRef<number | null>(null);
@@ -53,14 +49,10 @@ const RealtimeClock = ({
 
   return (
     <div className="flex flex-col items-center">
-        <div className="text-4xl font-semibold">
-            {time}
-        </div>
-        <div className="font-semibold">
-            {date}
-        </div>
+      <div className="text-4xl font-semibold">{time}</div>
+      <div className="font-semibold">{date}</div>
     </div>
-  )
+  );
 };
 
 export default RealtimeClock;

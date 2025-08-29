@@ -6,10 +6,13 @@ import { getServerSession } from "next-auth";
 export default async function CompanyAdmin() {
   const session = await getServerSession(authOptions);
   const dataCompany = await fetchCompany(session?.user.accessToken);
-  
+
   return (
     <div>
-      <CompanyProfile companyData={dataCompany} />
+      <CompanyProfile
+        companyData={dataCompany}
+        accessToken={session?.user.accessToken}
+      />
     </div>
   );
 }

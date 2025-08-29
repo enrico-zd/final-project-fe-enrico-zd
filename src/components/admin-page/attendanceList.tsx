@@ -1,4 +1,5 @@
-import { Eye } from "lucide-react";
+"use client";
+import { Delete, Eye } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -8,22 +9,130 @@ import {
   TableRow,
 } from "../ui/table";
 import Link from "next/link";
-import { fetchAttendanceCompany } from "@/services/AttendanceApi";
-// import { useState } from "react";
-// import { IAttendance, IError, IUserCompanyDetail } from "@/types/interface";
+import {
+  fetchAttendanceCompany,
+  fetchCheckIn,
+  fetchCheckOut,
+  fetchResetAttendance,
+} from "@/services/AttendanceApi";
+import { TimeFormat } from "@/lib/timeFormating";
+import { IAttendance, ICheckIn, ICheckOut, IError } from "@/types/interface";
+import { toISOStringNoMs } from "@/utils/toIsoStringNoMs";
+import { useEffect, useState } from "react";
 
-const AttendanceList = async ({
+const AttendanceList = ({
   companyId,
   token,
 }: {
   companyId: number | undefined;
   token: string | undefined;
 }) => {
+  const [attendanceList, setAttendanceList] = useState<IAttendance[]>([]);
+  const [error, setError] = useState<IError | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const attendanceList = await fetchAttendanceCompany(companyId, token);
-  console.log(attendanceList)
+  // formating absent time
+  const now = new Date();
+  const absentTime = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+  const formatted = toISOStringNoMs(absentTime);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        setError(null);
+        const data = await fetchAttendanceCompany(companyId, token);
+        if (!cancelled) {
+          setAttendanceList(data);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError({
+            message:
+              err instanceof Error ? err.message : "Unknown error occured",
+            name: err instanceof Error ? err.name : undefined,
+            code: err instanceof Error ? 500 : undefined,
+          });
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true; // mencegah setState setelah unmount
+    };
+  }, [token, companyId]);
+
+  const buildCheckInPayload = (): ICheckIn => ({
+    check_in_at: formatted,
+  });
+
+  const buildCheckOutPayload = (): ICheckOut => ({
+    check_out_at: formatted,
+  });
+
+  const handleCheckin = async (userId: number) => {
+    try {
+      setIsLoading(true);
+      await fetchCheckIn(userId, buildCheckInPayload(), token);
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+      window.location.reload();
+    }
+  };
+
+  const handleCheckOut = async (userId: number) => {
+    try {
+      setIsLoading(true);
+      await fetchCheckOut(userId, buildCheckOutPayload(), token);
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+      window.location.reload();
+    }
+  };
+
+  const handleResetAttendance = async (attendanceId: number) => {
+    try {
+      setIsLoading(true);
+      await fetchResetAttendance(attendanceId, token);
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+      window.location.reload();
+    }
+  };
+
   return (
     <Table className="[&_th]:text-center [&_th]:text-white text-center rounded-xl overflow-hidden">
+      {error && (
+        <div>
+          <p>{error.message}</p>
+          <p>{error.name}</p>
+          <p>{error.code}</p>
+        </div>
+      )}
       <TableHeader className="bg-amber-400">
         <TableRow>
           <TableHead></TableHead>
@@ -34,6 +143,7 @@ const AttendanceList = async ({
           <TableHead>Attendance Status</TableHead>
           <TableHead>Attendance By</TableHead>
           <TableHead>Late</TableHead>
+          <TableHead>Action</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody className="bg-amber-100">
@@ -46,11 +156,61 @@ const AttendanceList = async ({
             </TableCell>
             <TableCell>{index + 1}</TableCell>
             <TableCell>{attendance.user.name}</TableCell>
-            <TableCell>{attendance.check_in_at === null ? "-" : attendance.check_in_at}</TableCell>
-            <TableCell>{attendance.check_out_at === null ? "-" : attendance.check_out_at}</TableCell>
+            <TableCell>
+              {attendance.check_in_at === null
+                ? "-"
+                : TimeFormat(attendance.check_in_at)}
+            </TableCell>
+            <TableCell>
+              {attendance.check_out_at === null
+                ? "-"
+                : TimeFormat(attendance.check_out_at)}
+            </TableCell>
             <TableCell>{attendance.attendance_status}</TableCell>
-            <TableCell>{attendance.attendance_by === null ? "-" : attendance.attendance_by}</TableCell>
-            <TableCell>{attendance.check_out_at === null ? "-" : attendance.late_minute}</TableCell>
+            <TableCell>
+              {attendance.attendance_by === null
+                ? "-"
+                : attendance.attendance_by}
+            </TableCell>
+            <TableCell>
+              {attendance.check_out_at === null ? "-" : attendance.late_minute}
+            </TableCell>
+            <TableCell>
+              {isLoading ? (
+                <p>Loading..</p>
+              ) : !attendance.check_in_at ? (
+                <button
+                  onClick={() => handleCheckin(attendance.user.user_id)}
+                  className="py-1 px-2 bg-amber-500 text-white font-semibold rounded-md"
+                >
+                  Check In
+                </button>
+              ) : !attendance.check_out_at ? (
+                <div className="flex justify-center gap-2">
+                  <button
+                    onClick={() => handleCheckOut(attendance.user.user_id)}
+                    className="py-1 px-2 bg-amber-500 text-white font-semibold rounded-md"
+                  >
+                    Check Out
+                  </button>
+                  <Delete
+                    onClick={() =>
+                      handleResetAttendance(attendance.attendance_id)
+                    }
+                    className="text-red-500"
+                  />
+                </div>
+              ) : (
+                <div className="flex justify-center">
+                  <Delete
+                    onClick={() =>
+                      handleResetAttendance(attendance.attendance_id)
+                    }
+                    className="text-red-500"
+                  />
+                </div>
+              )}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>

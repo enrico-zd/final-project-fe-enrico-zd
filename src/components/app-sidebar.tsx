@@ -102,7 +102,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     };
   }, [status, session?.user.accessToken]);
 
-  console.log(error);
   return (
     <div>
       {isLoading ? (
@@ -142,6 +141,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </aside>
       ) : (
         <Sidebar collapsible="offcanvas" {...props}>
+          {error && <h1>{error.message}</h1>}
           {/* sidebar header */}
           <SidebarHeader>
             <SidebarMenu>

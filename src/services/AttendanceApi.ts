@@ -112,7 +112,7 @@ export const fetchCheckIn = async (
     const msg =
       detail?.message && Array.isArray(detail.message)
         ? detail.message.join(", ")
-        : detail?.message || "Failed to update user";
+        : detail?.message || "Failed to Check In";
     throw new Error(`${response.status} ${response.statusText} - ${msg}`);
   }
 
@@ -144,7 +144,37 @@ export const fetchCheckOut = async (
     const msg =
       detail?.message && Array.isArray(detail.message)
         ? detail.message.join(", ")
-        : detail?.message || "Failed to update user";
+        : detail?.message || "Failed to Check Out";
+    throw new Error(`${response.status} ${response.statusText} - ${msg}`);
+  }
+
+  return response.json();
+};
+
+export const fetchResetAttendance = async (
+  AttendanceId: number | undefined,
+  accessToken: string | undefined
+): Promise<IAttendance> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL!}/attendance/reset/${AttendanceId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    let detail = null;
+    try {
+      detail = await response.json();
+    } catch {}
+    const msg =
+      detail?.message && Array.isArray(detail.message)
+        ? detail.message.join(", ")
+        : detail?.message || "Failed to reset attendance";
     throw new Error(`${response.status} ${response.statusText} - ${msg}`);
   }
 

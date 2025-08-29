@@ -46,8 +46,6 @@ const Overview = () => {
     };
   }, [status, session?.user.accessToken]);
 
-  console.log(attendance)
-
   // fetch leave request
   useEffect(() => {
     if (status !== "authenticated" || !session?.user.accessToken) return;
@@ -82,7 +80,7 @@ const Overview = () => {
 
   return (
     <div className="grid grid-cols-[repeat(2,180px)] justify-items-center mt-4">
-      <Card className="data-[slot=card]:w-[168px]">
+      <Card className="data-[slot=card]:w-[168px] shadow-lg bg-amber-50">
         <CardHeader className="flex flex-col h-[90px] justify-between w-full">
           <div className="">
             <CardTitle>
@@ -92,12 +90,16 @@ const Overview = () => {
           </div>
           <div className="w-full flex flex-row items-center justify-between">
             <CardDescription className="text-2xl">
-              {isLoading ? "Loading..." : error ? error.message :  attendance.length}
+              {isLoading
+                ? "Loading..."
+                : error
+                ? error.message
+                : attendance.length}
             </CardDescription>
           </div>
         </CardHeader>
       </Card>
-      <Card className="data-[slot=card]:w-[168px]">
+      <Card className="data-[slot=card]:w-[168px] shadow-lg bg-amber-50" >
         <CardHeader className="flex flex-col h-[90px] justify-between w-full">
           <div className="">
             <CardTitle>
@@ -106,7 +108,9 @@ const Overview = () => {
             <CardDescription>Leave</CardDescription>
           </div>
           <div className="w-full flex flex-row items-center justify-between">
-            <CardDescription className="text-2xl">{isLoading ? "Loading..." : error ? error.message :  leave.length}</CardDescription>
+            <CardDescription className="text-2xl">
+              {isLoading ? "Loading..." : error ? error.message : leave.length}
+            </CardDescription>
           </div>
         </CardHeader>
       </Card>

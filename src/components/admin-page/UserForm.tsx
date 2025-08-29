@@ -1,9 +1,11 @@
-/* eslint-disable @next/next/no-img-element */
-/* eslint-disable jsx-a11y/alt-text */
 "use client";
 import { TimeFormat } from "@/lib/timeFormating";
 import { fetchShift } from "@/services/ShiftAPI";
-import { fetchUserCompanyById } from "@/services/UserAPI";
+import {
+  fetchCreateUserDetail,
+  fetchUpdateUserDetail,
+  fetchUserCompanyById,
+} from "@/services/UserAPI";
 import {
   EmployeeType,
   IError,
@@ -15,12 +17,13 @@ import {
   UserType,
   WorkSpace,
 } from "@/types/interface";
+import { UploadButton } from "@/utils/uploadthing";
 import { format, parseISO } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
-type FormData = {
+export type FormDataUserDetail = {
   user: {
     nik: string;
     family_card_number: string;
@@ -36,14 +39,14 @@ type FormData = {
     password: string;
     role: "Admin" | "staff" | "internship";
   };
-  employment: {
+  employee: {
     company_id: number;
     employee_type: "Permanent" | "Contract" | "Temporary";
     user_type: "Field" | "Nonfiled";
     workspace: "Office" | "Home";
     shift_id?: number | null;
-    joining_date: string;
-    leaving_date?: string | null;
+    joining_date: Date;
+    leaving_date?: Date | null;
     user_status: "Active" | "Inactive";
   };
 };
@@ -65,6 +68,7 @@ const UserForm = ({
   const [dataUsers, setDataUsers] = useState<IUserCompanyDetail>();
   const [shiftData, setShiftData] = useState<IShift[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<IError | null>(null);
   useEffect(() => {
     const resolvedUserId =
@@ -97,7 +101,9 @@ const UserForm = ({
           });
         }
       } finally {
-        if (!cancelled) setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     })();
 
@@ -106,15 +112,38 @@ const UserForm = ({
     };
   }, [status, id, session?.user.user_id, session?.user.accessToken]);
 
-  console.log(error);
+  const methods = useForm<FormDataUserDetail>();
+  const onSubmit = methods.handleSubmit(async (data) => {
+    setError(null);
 
-  const methods = useForm<FormData>();
-  const onSubmit = methods.handleSubmit((data) => console.log(data));
+    try {
+      setSuccess("");
+      if (modes === "edit") {
+        await fetchUpdateUserDetail(
+          dataUsers?.user_company_id,
+          session?.user.accessToken,
+          data
+        );
+        setSuccess("Berhasil Update");
+      } else if (modes === "create") {
+        await fetchCreateUserDetail(session?.user.accessToken, data);
+        setSuccess("Berhasil Create");
+      }
+    } catch (err) {
+      setError({
+        message: err instanceof Error ? err.message : "Unknown error occured",
+        name: err instanceof Error ? err.name : undefined,
+        code: err instanceof Error ? 500 : undefined,
+      });
+    }
+  });
   const action =
     modes === "create" ? "Create" : modes === "edit" ? "Update" : "";
   return (
     <div className="flex flex-col items-center gap-4">
+      {error && <h1>{error.message}</h1>}
       {isLoading && <h1>Loading...</h1>}
+      {success && <h1>{success}</h1>}
       <div className="bg-amber-200 w-[96%] px-6 py-4 h-full rounded-sm">
         <FormProvider {...methods}>
           <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 mt-4">
@@ -124,7 +153,10 @@ const UserForm = ({
               shiftData={shiftData}
               modes={modes}
             />
-            <button type="submit" className="mt-2 py-2 sm:col-span-0 xl:col-span-2 justify-self-center flex justify-center w-[200px] rounded-sm text-white bg-amber-400 hover:bg-amber-500">
+            <button
+              type="submit"
+              className="mt-2 py-2 sm:col-span-0 xl:col-span-2 justify-self-center flex justify-center w-[200px] rounded-sm text-white bg-amber-400 hover:bg-amber-500"
+            >
               {action} User
             </button>
           </form>
@@ -142,7 +174,7 @@ function PersonalDetails({
   userData?: IUser | undefined;
   modes?: string;
 }) {
-  const { register, setValue } = useFormContext<FormData>();
+  const { register, setValue } = useFormContext<FormDataUserDetail>();
   if (!userData) return;
 
   return (
@@ -156,14 +188,12 @@ function PersonalDetails({
           <input
             defaultValue={modes === "edit" ? userData.nik : ""}
             className="bg-amber-50 p-1 rounded-sm"
-            {...register("user.nik")}
           />
         </Field>
         <Field label="Family Card Number">
           <input
             defaultValue={modes === "edit" ? userData.family_card_number : ""}
             className="bg-amber-50 p-1 rounded-sm"
-            {...register("user.family_card_number")}
           />
         </Field>
 
@@ -171,14 +201,12 @@ function PersonalDetails({
           <input
             defaultValue={modes === "edit" ? userData.employment_number : ""}
             className="bg-amber-50 p-1 rounded-sm"
-            {...register("user.employment_number")}
           />
         </Field>
         <Field label="Passport Number">
           <input
             defaultValue={modes === "edit" ? userData.passport_number : ""}
             className="bg-amber-50 p-1 rounded-sm"
-            {...register("user.passport_number")}
           />
         </Field>
 
@@ -234,22 +262,9 @@ function PersonalDetails({
           />
         </Field>
 
-        <Field label="Avatar (file name only)">
-          <input
-            className="bg-amber-50 p-1 rounded-sm"
-            // defaultValue={modes === "edit" ? userd : ""}
-            type="file"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) setValue("user.avatar", file.name);
-            }}
-          />
-          <img src={userData.avatar} className="w-50 h-auto" />
-        </Field>
-
         <Field label="Role">
           <select
-            defaultValue=""
+            defaultValue={modes === "edit" ? userData.role : ""}
             className="bg-amber-50 p-1 rounded-sm"
             {...register("user.role", { required: true })}
           >
@@ -260,6 +275,35 @@ function PersonalDetails({
             <option value={Role.Staff}>staff</option>
             <option value={Role.Internship}>internship</option>
           </select>
+        </Field>
+
+        {modes === "create" && (
+          <Field label="Password">
+            <input
+              className="bg-amber-50 p-1 rounded-sm"
+              {...register("user.password", { required: true })}
+            />
+          </Field>
+        )}
+        <Field label="Avatar (file name only)">
+          <UploadButton
+            appearance={{
+              button:
+                "ut-ready:bg-amber-500 ut-uploading:cursor-not-allowed rounded-r-none bg-red-500 bg-none after:bg-orange-400 w-24",
+              container:
+                "w-max flex-row rounded-md border-cyan-300 bg-slate-800",
+              allowedContent:
+                "flex h-8 flex-col items-center justify-center px-2 text-white",
+            }}
+            endpoint="imageUploader"
+            onClientUploadComplete={(res) => {
+              setValue("user.avatar", res[0].ufsUrl);
+              alert("Upload Completed");
+            }}
+            onUploadError={(error: Error) => {
+              alert(`ERROR! ${error.message}`);
+            }}
+          />
         </Field>
       </div>
     </section>
@@ -272,7 +316,7 @@ function CompanyDetails({
   shiftData,
   modes,
 }: CompanyDetailsProps) {
-  const { register } = useFormContext<FormData>();
+  const { register } = useFormContext<FormDataUserDetail>();
   if (!userCompanyDetail) return;
 
   return (
@@ -285,8 +329,8 @@ function CompanyDetails({
         <Field label="Company">
           <select
             className="bg-amber-50 p-1 rounded-sm"
-            defaultValue={""}
-            {...register("employment.company_id", {
+            defaultValue={userCompanyDetail.company_id}
+            {...register("employee.company_id", {
               required: true,
               valueAsNumber: true,
             })}
@@ -306,7 +350,7 @@ function CompanyDetails({
               modes === "edit" ? userCompanyDetail.employee_type : ""
             }
             className="bg-amber-50 p-1 rounded-sm"
-            {...register("employment.employee_type", { required: true })}
+            {...register("employee.employee_type", { required: true })}
           >
             <option value={EmployeeType.Permanent}>Permanent</option>
             <option value={EmployeeType.Contract}>Contract</option>
@@ -318,7 +362,7 @@ function CompanyDetails({
           <select
             defaultValue={modes === "edit" ? userCompanyDetail.user_type : ""}
             className="bg-amber-50 p-1 rounded-sm"
-            {...register("employment.user_type", { required: true })}
+            {...register("employee.user_type", { required: true })}
           >
             <option value={UserType.Field}>Field</option>
             <option value={UserType.NonField}>Nonfiled</option>
@@ -329,7 +373,7 @@ function CompanyDetails({
           <select
             defaultValue={modes === "edit" ? userCompanyDetail.workspace : ""}
             className="bg-amber-50 p-1 rounded-sm"
-            {...register("employment.workspace", { required: true })}
+            {...register("employee.workspace", { required: true })}
           >
             <option value={WorkSpace.Office}>Office</option>
             <option value={WorkSpace.Home}>Home</option>
@@ -348,7 +392,10 @@ function CompanyDetails({
             }
             className="bg-amber-50 p-1 rounded-sm"
             type="date"
-            {...register("employment.joining_date", { required: true })}
+            {...register("employee.joining_date", {
+              required: true,
+              setValueAs: (v) => (v ? new Date(v).toISOString() : null),
+            })}
           />
         </Field>
 
@@ -364,15 +411,19 @@ function CompanyDetails({
             }
             className="bg-amber-50 p-1 rounded-sm"
             type="date"
-            {...register("employment.leaving_date")}
+            {...register("employee.leaving_date", {
+              setValueAs: (v) => (v ? new Date(v).toISOString() : null),
+            })}
           />
         </Field>
 
         <Field label="Shift">
           <select
             className="bg-amber-50 p-1 rounded-sm"
-            defaultValue=""
-            {...register("employment.shift_id", {
+            defaultValue={
+              !userCompanyDetail.shift_id ? "" : userCompanyDetail.shift_id
+            }
+            {...register("employee.shift_id", {
               required: true,
               valueAsNumber: true,
             })}
@@ -393,7 +444,7 @@ function CompanyDetails({
         <Field label="Status">
           <select
             className="bg-amber-50 p-1 rounded-sm"
-            {...register("employment.user_status", { required: true })}
+            {...register("employee.user_status", { required: true })}
           >
             <option value={StatusActive.Active}>Active</option>
             <option value={StatusActive.Inactive}>Inactive</option>
