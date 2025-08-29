@@ -43,7 +43,7 @@ export default function LoginForm() {
 
           if (role === "ADMIN") {
             router.push("/admin/dashboard");
-          } else if (role === "STAFF") {
+          } else if (role === "STAFF" || role === "INTERNSHIP") {
             router.push("/staff/dashboard");
           } else {
             router.push("/");
