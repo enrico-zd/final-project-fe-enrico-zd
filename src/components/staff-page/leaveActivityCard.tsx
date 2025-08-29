@@ -5,6 +5,7 @@ import { IError, ILeaveRequest } from "@/types/interface";
 import { useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { TimeFormat } from "@/lib/timeFormating";
+import { formatInTimeZone } from "date-fns-tz";
 
 const LeaveActivityCard = ({
   accessToken,
@@ -52,6 +53,7 @@ const LeaveActivityCard = ({
       cancelled = true; // mencegah setState setelah unmount
     };
   }, [statusSession, accessToken, typeSelect]);
+
   return (
     <div className="grid grid-cols-1 gap-3 justify-items-center my-4 mx-4 h-[286px] rounded-xl overflow-x-auto">
       {error && (
@@ -83,7 +85,8 @@ const LeaveActivityCard = ({
               <CardDescription>
                 {format(parseISO(request.from), "MMM d")}{" "}
                 {TimeFormat(request.from)} -{" "}
-                {format(parseISO(request.to), "MMM d")} {TimeFormat(request.to)}
+                {formatInTimeZone(request.to, "UTC", "MMM d")}{" "}
+                {TimeFormat(request.to)}
               </CardDescription>
               <CardDescription>
                 Requested: {format(parseISO(request.request_date), "MMM d")}{" "}
