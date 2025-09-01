@@ -107,10 +107,11 @@ yarn install
 ### 3. Setup Environment
 
 ```bash
-NEXTAUTH_SECRET=your-secret
-NEXTAUTH_URL=http://localhost:3000
-API_URL=http://localhost:5000
+NEXT_PUBLIC_API_URL=
+NEXTAUTH_SECRET=
+UPLOADTHING_TOKEN=
 ```
+Get uploadthing token by creating a new project in [uploadthing](https://uploadthing.com)
 
 ### 4. Run Development Server
 
@@ -121,9 +122,11 @@ npm run dev
 ## 🌐 Live Demo
 
 ### Admin Dashboard Screenshot
+
 <img src="./public/hrms-admin-dashboard.png" alt="Admin Dashboard" width="600" style="margin:auto; display:block;"/>
 
 ### Staff Dashboard Screenshot
+
 <img src="./public/hrms-staff-dashboard.png" alt="Staff Dashboard" width="600" style="margin:auto; display:block;"/>
 <br/>
 
