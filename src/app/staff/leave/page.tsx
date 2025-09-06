@@ -26,7 +26,7 @@ export default function StaffLeave() {
   }, [session, status, router]);
 
   return (
-    <div className="shadow-amber-200 h-screen bg-amber-100 w-[375px]">
+    <div className="shadow-amber-200 h-fix bg-amber-100 w-[375px]">
       <div className="m-2 flex flex-row justify-between relative">
         <div className="flex flex-row gap-2 items-center">
           <div>
@@ -72,7 +72,7 @@ export default function StaffLeave() {
       <p className="text-center mt-4 mb-1 text-2xl font-semibold">
         Recent Leave Activity
       </p>
-      <div className="flex justify-center">
+      <div className="flex justify-center pb-6">
         <LeaveActivity
           accessToken={session?.user.accessToken}
           statusSession={status}

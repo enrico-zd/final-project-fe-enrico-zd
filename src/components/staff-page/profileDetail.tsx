@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { IError, IUser } from "@/types/interface";
 import { fetchUser } from "@/services/UserAPI";
 import { format, parseISO } from "date-fns";
+import { toast } from "sonner";
+import ProfileDetailSkeleton from "../skeletons/ProfileDetailSkeleton";
 
 const ProfileDetail = () => {
   const { data: session, status } = useSession();
@@ -15,47 +17,37 @@ const ProfileDetail = () => {
   useEffect(() => {
     if (status !== "authenticated" || !session?.user.accessToken) return;
 
-    let cancelled = false;
     (async () => {
       try {
         setIsLoading(true);
         setError(null);
         const user = await fetchUser(session.user.user_id);
-        if (!cancelled) setUser(user);
+        setUser(user);
       } catch (err) {
-        if (!cancelled) {
-          setError({
-            message:
-              err instanceof Error ? err.message : "Unknown error occured",
-            name: err instanceof Error ? err.name : undefined,
-            code: err instanceof Error ? 500 : undefined,
-          });
-        }
+        setError({
+          message: err instanceof Error ? err.message : "Unknown error occured",
+          name: err instanceof Error ? err.name : undefined,
+          code: err instanceof Error ? 500 : undefined,
+        });
       } finally {
-        if (!cancelled) setIsLoading(false);
+        setIsLoading(false);
       }
     })();
-
-    return () => {
-      cancelled = true; // mencegah setState setelah unmount
-    };
   }, [status, session?.user.accessToken, session?.user.user_id]);
 
-  if (!user) return;
+  // set error alert
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message, {
+        description: `${error.name ?? ""} ${error.code ?? ""}`,
+      });
+    }
+  }, [error]);
 
   return (
     <div>
-      {error && (
-        <div>
-          <p>{error.message}</p>
-          <p>{error.name}</p>
-          <p>{error.code}</p>
-        </div>
-      )}
-      {isLoading ? (
-        <div>
-          <h1>Loading...</h1>
-        </div>
+      {isLoading || !user ? (
+        <ProfileDetailSkeleton />
       ) : (
         <div>
           <div className="flex flex-col items-center">

@@ -136,7 +136,9 @@ export default function LoginForm() {
           </div>
 
           <div className="mt-2 py-2 flex justify-center w-full rounded-sm text-white bg-amber-400 hover:bg-amber-500">
-            {isLoading ? "Loading..." : <input type="submit" value="Login" />}
+            {isLoading ? (
+              <div className="h-8 w-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+            ) : <input type="submit" value="Login" />}
           </div>
           <div className="text-white text-md flex flex-col items-center">
             <p>Don&apos;t have register company?</p>

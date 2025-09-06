@@ -22,7 +22,7 @@ export default function DashboardStaff() {
   
 
   return (
-    <div className="pb-2 w-[375px] h-screen shadow shadow-amber-200 bg-amber-100">
+    <div className="pb-2 w-[375px] h-fix shadow shadow-amber-200 bg-amber-100">
       <div className="m-2">
         <Link href={"./profile"}>
           <div className="flex w-full justify-between gap-2 text-left text-sm">

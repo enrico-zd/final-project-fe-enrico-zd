@@ -5,13 +5,13 @@ import { IAttendance, IError, ILeaveRequest } from "@/types/interface";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { fetchAllLeaveRequestByUserId } from "@/services/LeaveRequest";
+import { toast } from "sonner";
 
 const Overview = () => {
   const { data: session, status } = useSession();
 
   const [attendance, setAttendance] = useState<IAttendance[]>([]);
   const [leave, setLeave] = useState<ILeaveRequest[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<IError | null>(null);
 
   // fetch attendance
@@ -21,7 +21,6 @@ const Overview = () => {
     let cancelled = false;
     (async () => {
       try {
-        setIsLoading(true);
         setError(null);
         const attendace = await fetchAllUserAttendanceHistory(
           session?.user.accessToken
@@ -36,9 +35,7 @@ const Overview = () => {
             code: err instanceof Error ? 500 : undefined,
           });
         }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
+      } 
     })();
 
     return () => {
@@ -53,7 +50,6 @@ const Overview = () => {
     let cancelled = false;
     (async () => {
       try {
-        setIsLoading(true);
         setError(null);
         const leaveReq = await fetchAllLeaveRequestByUserId(
           session?.user.accessToken
@@ -68,15 +64,22 @@ const Overview = () => {
             code: err instanceof Error ? 500 : undefined,
           });
         }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
+      } 
     })();
 
     return () => {
       cancelled = true; // mencegah setState setelah unmount
     };
   }, [status, session?.user.accessToken]);
+
+  // set error alert
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message, {
+        description: `${error.name ?? ""} ${error.code ?? ""}`,
+      });
+    }
+  }, [error]);
 
   return (
     <div className="grid grid-cols-[repeat(2,180px)] justify-items-center mt-4">
@@ -90,16 +93,12 @@ const Overview = () => {
           </div>
           <div className="w-full flex flex-row items-center justify-between">
             <CardDescription className="text-2xl">
-              {isLoading
-                ? "Loading..."
-                : error
-                ? error.message
-                : attendance.length}
+              {attendance.length}
             </CardDescription>
           </div>
         </CardHeader>
       </Card>
-      <Card className="data-[slot=card]:w-[168px] shadow-lg bg-amber-50" >
+      <Card className="data-[slot=card]:w-[168px] shadow-lg bg-amber-50">
         <CardHeader className="flex flex-col h-[90px] justify-between w-full">
           <div className="">
             <CardTitle>
@@ -109,7 +108,7 @@ const Overview = () => {
           </div>
           <div className="w-full flex flex-row items-center justify-between">
             <CardDescription className="text-2xl">
-              {isLoading ? "Loading..." : error ? error.message : leave.length}
+              {leave.length}
             </CardDescription>
           </div>
         </CardHeader>

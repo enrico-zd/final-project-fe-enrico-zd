@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import LeaveActivityCard from "./leaveActivityCard";
 import { fetchLeaveType } from "@/services/LeaveTypeApi";
 import { IError, ILeaveType } from "@/types/interface";
+import { toast } from "sonner";
 
 const LeaveActivity = ({
   accessToken,
@@ -22,7 +23,6 @@ const LeaveActivity = ({
 }) => {
   const [typeSelect, setTypeSelect] = useState<number | null>(null);
   const [leaveType, setLeaveType] = useState<ILeaveType[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<IError | null>(null);
 
   useEffect(() => {
@@ -31,7 +31,6 @@ const LeaveActivity = ({
     let cancelled = false;
     (async () => {
       try {
-        setIsLoading(true);
         setError(null);
         const dataLeaveType = await fetchLeaveType(accessToken);
         if (!cancelled) {
@@ -47,9 +46,7 @@ const LeaveActivity = ({
             code: err instanceof Error ? 500 : undefined,
           });
         }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
+      } 
     })();
 
     return () => {
@@ -57,20 +54,17 @@ const LeaveActivity = ({
     };
   }, [statusSession, accessToken]);
 
+  // set error alert
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message, {
+        description: `${error.name ?? ""} ${error.code ?? ""}`,
+      });
+    }
+  }, [error]);
+
   return (
     <div className="w-full h-[370px] mx-2 rounded-lg bg-amber-500">
-      {error && (
-        <div>
-          <p>{error.message}</p>
-          <p>{error.name}</p>
-          <p>{error.code}</p>
-        </div>
-      )}
-      {isLoading && (
-        <div>
-          <p>Loading...</p>
-        </div>
-      )}
       <div className="flex flex-row justify-between items-center m-4">
         <p className="text-2xl text-white">Filter</p>
         <DropdownMenu>

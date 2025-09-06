@@ -60,7 +60,7 @@ export const fetchAllUserAttendanceHistory = async (
   );
 
   if (!response.ok) {
-    throw new Error("Failed to fetch data Attendance");
+    throw new Error("Failed to get Attendance History");
   }
 
   return response.json();
