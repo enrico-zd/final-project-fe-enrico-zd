@@ -78,6 +78,7 @@ const EditProfile = () => {
     }
   };
 
+  // set alert for success and error
   useEffect(() => {
     if (error) {
       toast.error(error.message);

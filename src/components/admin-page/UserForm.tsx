@@ -22,6 +22,8 @@ import { format, parseISO } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { toast } from "sonner";
+import EmployeeFormSkeleton from "../skeletons/EmployeeFormSkeleton";
 
 export type FormDataUserDetail = {
   user: {
@@ -139,28 +141,39 @@ const UserForm = ({
   });
   const action =
     modes === "create" ? "Create" : modes === "edit" ? "Update" : "";
+
+  // set alert for success and error
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message);
+    } else if (success) {
+      toast.success(success);
+    }
+  });
+
   return (
     <div className="flex flex-col items-center gap-4">
-      {error && <h1>{error.message}</h1>}
-      {isLoading && <h1>Loading...</h1>}
-      {success && <h1>{success}</h1>}
       <div className="bg-amber-200 w-[96%] px-6 py-4 h-full rounded-sm">
-        <FormProvider {...methods}>
-          <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 mt-4">
-            <PersonalDetails userData={dataUsers?.user} modes={modes} />
-            <CompanyDetails
-              userCompanyDetail={dataUsers}
-              shiftData={shiftData}
-              modes={modes}
-            />
-            <button
-              type="submit"
-              className="mt-2 py-2 sm:col-span-0 xl:col-span-2 justify-self-center flex justify-center w-[200px] rounded-sm text-white bg-amber-400 hover:bg-amber-500"
-            >
-              {action} User
-            </button>
-          </form>
-        </FormProvider>
+        {isLoading ? (
+          <EmployeeFormSkeleton />
+        ) : (
+          <FormProvider {...methods}>
+            <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 mt-4">
+              <PersonalDetails userData={dataUsers?.user} modes={modes} />
+              <CompanyDetails
+                userCompanyDetail={dataUsers}
+                shiftData={shiftData}
+                modes={modes}
+              />
+              <button
+                type="submit"
+                className="mt-2 py-2 sm:col-span-0 xl:col-span-2 justify-self-center flex justify-center w-[200px] rounded-sm text-white bg-amber-400 hover:bg-amber-500"
+              >
+                {action} User
+              </button>
+            </form>
+          </FormProvider>
+        )}
       </div>
     </div>
   );
@@ -298,10 +311,10 @@ function PersonalDetails({
             endpoint="imageUploader"
             onClientUploadComplete={(res) => {
               setValue("user.avatar", res[0].ufsUrl);
-              alert("Upload Completed");
+              toast.success("Upload Completed");
             }}
             onUploadError={(error: Error) => {
-              alert(`ERROR! ${error.message}`);
+              toast.success(`ERROR! ${error.message}`);
             }}
           />
         </Field>

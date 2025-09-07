@@ -5,6 +5,7 @@ import { ICompany, IError, StatusActive } from "@/types/interface";
 import { UploadButton } from "@/utils/uploadthing";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function CompanyProfile({
   companyData,
@@ -195,10 +196,10 @@ export default function CompanyProfile({
               endpoint="imageUploader"
               onClientUploadComplete={(res) => {
                 setValue("image_company", res[0].ufsUrl);
-                alert("Upload Completed");
+                toast.success("Upload Completed");
               }}
               onUploadError={(error: Error) => {
-                alert(`ERROR! ${error.message}`);
+                toast.error(`ERROR! ${error.message}`);
               }}
             />
           </div>

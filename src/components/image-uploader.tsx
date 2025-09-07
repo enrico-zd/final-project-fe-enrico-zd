@@ -4,6 +4,7 @@
 
 import { UploadButton } from "@/utils/uploadthing";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const ImageUpload = () => {
   const [imageUrl, setImageUrl] = useState<string>("");
@@ -21,10 +22,10 @@ const ImageUpload = () => {
         endpoint="imageUploader"
         onClientUploadComplete={(res) => {
           setImageUrl(res[0].ufsUrl);
-          alert("Upload Completed");
+          toast.success("Upload Completed");
         }}
         onUploadError={(error: Error) => {
-          alert(`ERROR! ${error.message}`);
+          toast.error(`ERROR! ${error.message}`);
         }}
       />
       <img className="w-[200px] h-auto mt-2" src={imageUrl} />

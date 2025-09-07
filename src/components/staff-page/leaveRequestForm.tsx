@@ -7,6 +7,7 @@ import { fetchLeaveType } from "@/services/LeaveTypeApi";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { UploadButton } from "@/utils/uploadthing";
 import { fetchCreateLeaveRequest } from "@/services/LeaveRequest";
+import { toast } from "sonner";
 
 export default function LeaveRequestForm() {
   const { data: session, status } = useSession();
@@ -164,10 +165,10 @@ export default function LeaveRequestForm() {
               endpoint="imageUploader"
               onClientUploadComplete={(res) => {
                 setValue("proof_image", res[0].ufsUrl);
-                alert("Upload Completed");
+                toast.success("Upload Completed");
               }}
               onUploadError={(error: Error) => {
-                alert(`ERROR! ${error.message}`);
+                toast.error(`ERROR! ${error.message}`);
               }}
             />
           </div>

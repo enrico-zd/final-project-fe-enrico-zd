@@ -11,6 +11,8 @@ import { Delete, Eye, SquarePen } from "lucide-react";
 import { fetchAllUserCompany, fetchDeleteUser } from "@/services/UserAPI";
 import { IError, IUserCompanyDetail } from "@/types/interface";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import UserTableSkeleton from "../skeletons/UserTableSkeleton";
 
 const UserList = ({
   token,
@@ -73,19 +75,22 @@ const UserList = ({
         name: err instanceof Error ? err.name : undefined,
         code: err instanceof Error ? 500 : undefined,
       });
-    } finally {
-      setTimeout(() => {
-        setSuccess("");
-      }, 1000);
-    }
+    } 
   };
+
+  // set alert for success and error
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message);
+    } else if (success) {
+      toast.success(success);
+    }
+  })
 
   return (
     <div className="px-2">
-      {success && <h1>{success}</h1>}
-      {error && <h1>{error.message}</h1>}
       {isLoading ? (
-        <h1>loading</h1>
+        <UserTableSkeleton />
       ) : (
         <Table className="[&_th]:text-center [&_th]:text-white text-center rounded-xl overflow-hidden">
           <TableHeader className="bg-amber-400">
