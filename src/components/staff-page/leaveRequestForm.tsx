@@ -1,3 +1,4 @@
+"use client"
 import { PencilLine } from "lucide-react";
 
 import { useEffect, useState } from "react";
@@ -61,26 +62,24 @@ export default function LeaveRequestForm() {
       });
     } finally {
       SetIsLoading(false);
-      setSuccess("Update Berhasil");
+      setSuccess("Berhasil Request Leave");
+      setTimeout(() => {
+        window.location.reload()
+      }, 2000);
     }
   };
+
+  useEffect(() => {
+    if (error){
+      toast.error(error.message)
+    } else if (success) {
+      toast.success(success)
+    }
+  })
   return (
     <div className="flex flex-col items-center gap-4 w-[376px] pt-2">
       <div className="bg-amber-200 w-[96%] px-6 py-4 h-full rounded-sm">
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-          {error ? (
-            <div>
-              <p>{error.message}</p>
-              <p>{error.name}</p>
-              <p>{error.code}</p>
-            </div>
-          ) : (
-            success && (
-              <div>
-                <p>{success}</p>
-              </div>
-            )
-          )}
           <div className="relative py-2">
             <select
               className="w-full pl-2 pr-3 py-2 rounded-md rounded-bl-none rounded-tr-none bg-amber-50

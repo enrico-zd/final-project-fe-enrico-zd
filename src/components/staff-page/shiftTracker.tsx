@@ -21,6 +21,7 @@ const ShiftTracker = () => {
   const [error, setError] = useState<IError | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingData, setLoadingData] = useState<boolean>(false);
+  const [success, setSuccess] = useState<string>("");
 
   // formating absent time
   const now = new Date();
@@ -68,13 +69,16 @@ const ShiftTracker = () => {
 
   const handleCheckin = async () => {
     try {
+      setError(null);
       setIsLoading(true);
+      setSuccess("");
       const checkIn = await fetchCheckIn(
         session?.user.user_id,
         buildCheckInPayload(),
         session?.user.accessToken
       );
       setAttendance(checkIn);
+      setSuccess("Berhasil Check In")
     } catch (err) {
       setError({
         message: err instanceof Error ? err.message : "Unknown error occured",
@@ -83,20 +87,24 @@ const ShiftTracker = () => {
       });
     } finally {
       setTimeout(() => {
+        setSuccess("")
         setIsLoading(false);
-      }, 500);
+      }, 2000);
     }
   };
 
   const handleCheckOut = async () => {
     try {
+      setError(null);
       setIsLoading(true);
+      setSuccess("");
       const checkOut = await fetchCheckOut(
         session?.user.user_id,
         buildCheckOutPayload(),
         session?.user.accessToken
       );
       setAttendance(checkOut);
+      setSuccess("Berhasil Check Out")
     } catch (err) {
       setError({
         message: err instanceof Error ? err.message : "Unknown error occured",
@@ -105,8 +113,9 @@ const ShiftTracker = () => {
       });
     } finally {
       setTimeout(() => {
+        setSuccess("")
         setIsLoading(false);
-      }, 500);
+      }, 2000);
     }
   };
 
@@ -116,8 +125,10 @@ const ShiftTracker = () => {
       toast.error(error.message, {
         description: `${error.name ?? ""} ${error.code ?? ""}`,
       });
+    } else if (success) {
+      toast.success(success)
     }
-  }, [error]);
+  });
 
   return (
       <div className="w-[92%]">
