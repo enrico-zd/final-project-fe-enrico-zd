@@ -14,6 +14,8 @@ import { fetchDeleteShift, fetchShift } from "@/services/ShiftAPI";
 import Link from "next/link";
 import { Delete, SquarePen } from "lucide-react";
 import { TimeFormat } from "@/lib/timeFormating";
+import { toast } from "sonner";
+import ShiftTableSkeleton from "../skeletons/ShiftTableSkeleton";
 const ShiftList = ({
   token,
   statusAuth,
@@ -82,52 +84,62 @@ const ShiftList = ({
     }
   };
 
+  // set alert for success and error
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message);
+    } else if (success) {
+      toast.success(success);
+    }
+  });
+
   return (
     <div className="px-2">
-      {error && <h1>{error.message}</h1>}
-      {isLoading && <h1>Loading...</h1>}
-      {success && <h1>{success}</h1>}
-      <Table className="[&_th]:text-center [&_th]:text-white text-center rounded-xl overflow-hidden">
-        <TableHeader className="bg-amber-400">
-          <TableRow>
-            <TableHead>No</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Opening Time</TableHead>
-            <TableHead>Closing Time</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className="bg-amber-100">
-          {shiftData.map((shift, index: number) => (
-            <TableRow key={index}>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{shift.title}</TableCell>
-              <TableCell>{TimeFormat(shift.opening_time)}</TableCell>
-              <TableCell>{TimeFormat(shift.closing_time)}</TableCell>
-              <TableCell>{shift.status}</TableCell>
-              <TableCell className="flex justify-center gap-2 items-center">
-                <div>
-                  <Link href={`./shift/update/${shift.shift_id}`}>
-                    <SquarePen />
-                  </Link>
-                </div>
-                <div>
-                  <button
-                    onClick={() => {
-                      if (confirm("Yakin untuk hapus shift ini?")) {
-                        handleDelete(shift.shift_id);
-                      }
-                    }}
-                  >
-                    <Delete className="text-red-500" />
-                  </button>
-                </div>
-              </TableCell>
+      {isLoading ? (
+        <ShiftTableSkeleton />
+      ) : (
+        <Table className="[&_th]:text-center [&_th]:text-white text-center rounded-xl overflow-hidden">
+          <TableHeader className="bg-amber-400">
+            <TableRow>
+              <TableHead>No</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Opening Time</TableHead>
+              <TableHead>Closing Time</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Action</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody className="bg-amber-100">
+            {shiftData.map((shift, index: number) => (
+              <TableRow key={index}>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{shift.title}</TableCell>
+                <TableCell>{TimeFormat(shift.opening_time)}</TableCell>
+                <TableCell>{TimeFormat(shift.closing_time)}</TableCell>
+                <TableCell>{shift.status}</TableCell>
+                <TableCell className="flex justify-center gap-2 items-center">
+                  <div>
+                    <Link href={`./shift/update/${shift.shift_id}`}>
+                      <SquarePen />
+                    </Link>
+                  </div>
+                  <div>
+                    <button
+                      onClick={() => {
+                        if (confirm("Yakin untuk hapus shift ini?")) {
+                          handleDelete(shift.shift_id);
+                        }
+                      }}
+                    >
+                      <Delete className="text-red-500" />
+                    </button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 };

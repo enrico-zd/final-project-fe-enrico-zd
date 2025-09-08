@@ -20,6 +20,8 @@ import { useEffect, useState } from "react";
 import { fetchAttendanceCompany } from "@/services/AttendanceApi";
 import { fetchUserCompanyByUserId } from "@/services/UserAPI";
 import { fetchLeaveRequest } from "@/services/LeaveRequest";
+import DashboardSkeleton from "./skeletons/DashboardSkeleton";
+import { toast } from "sonner";
 
 export default function SectionCard({
   totalUser,
@@ -116,11 +118,17 @@ export default function SectionCard({
 
   const leaveCount = { activeToday, pending, paidLeave };
 
+  // set alert for success and error
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message);
+    } 
+  });
+
   return (
     <div>
-      {error && <h1>{error.message}</h1>}
       {isLoading ? (
-        <h1>Loading...</h1>
+        <DashboardSkeleton />
       ) : (
         <div className="grid xl:grid-cols-[repeat(3,400px)] lg:grid-cols-[repeat(2,400px)] md:grid-cols-[repeat(1,200px)] grid-rows-2 justify-items-center gap-4">
           <Card className="data-[slot=card]:w-[380px] bg-amber-200">

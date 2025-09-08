@@ -8,13 +8,13 @@ import { IError, IUserCompanyDetail } from "@/types/interface";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function DashboardAdmin() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
   const [userData, setUserData] = useState<IUserCompanyDetail[]>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<IError | null>(null);
 
   useEffect(() => {
@@ -30,7 +30,6 @@ export default function DashboardAdmin() {
     let cancelled = false;
     (async () => {
       try {
-        setIsLoading(true);
         setError(null);
         const user = await fetchAllUserCompany(session.user.accessToken);
         if (!cancelled) setUserData(user);
@@ -43,9 +42,7 @@ export default function DashboardAdmin() {
             code: err instanceof Error ? 500 : undefined,
           });
         }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
+      } 
     })();
 
     return () => {
@@ -79,6 +76,13 @@ export default function DashboardAdmin() {
     return acc;
   }, {});
 
+  // set alert for error
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message);
+    }
+  });
+
   if (!ageCounts) return;
 
   const dataAgeArr = Object.entries(ageCounts)
@@ -87,8 +91,6 @@ export default function DashboardAdmin() {
 
   return (
     <div className="flex flex-col items-center gap-4 justify-center">
-      {error && <h1>{error.message}</h1>}
-      {isLoading && <h1>Loading....</h1>}
       <div className="self-start">
         <NavBread currentPage="#" />
         <h1 className="text-4xl text-amber-700 ml-6">Dashboard</h1>
