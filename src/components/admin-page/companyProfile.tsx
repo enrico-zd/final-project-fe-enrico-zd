@@ -53,6 +53,15 @@ export default function CompanyProfile({
     }
   };
 
+  // set alert success dan error
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message)
+    } else if (success) {
+      toast.success(success)
+    }
+  })
+
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="self-start">
@@ -60,17 +69,6 @@ export default function CompanyProfile({
       </div>
       <div className="bg-amber-200 w-[98%] px-6 py-4 h-full rounded-sm">
         <h1 className="text-4xl text-amber-800">Company Profile</h1>
-        {error ? (
-          <div>
-            <p>{error.message}</p>
-          </div>
-        ) : (
-          success && (
-            <div>
-              <p>{success}</p>
-            </div>
-          )
-        )}
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="grid grid-cols-2 gap-3 mt-4"
