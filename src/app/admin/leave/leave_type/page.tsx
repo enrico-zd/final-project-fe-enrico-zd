@@ -4,10 +4,14 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 
 export default function LeaveType() {
+  const prevPath = {
+    path: "/admin/leave",
+    name: "Leave Request Section",
+  };
   return (
     <div>
       <div>
-        <NavBread currentPage="Leave Type List" />
+        <NavBread currentPage="Leave Type List" prevPath={prevPath}/>
       </div>
       <div>
         <div className="flex flex-row gap-2 justify-end py-4 px-2">

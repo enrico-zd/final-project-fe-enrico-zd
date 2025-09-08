@@ -7,12 +7,13 @@ import {
   TableRow,
 } from "../ui/table";
 import Link from "next/link";
-import { Delete, Eye, SquarePen } from "lucide-react";
-import { fetchAllUserCompany, fetchDeleteUser } from "@/services/UserAPI";
+import { Eye, SquarePen } from "lucide-react";
+import { fetchAllUserCompany } from "@/services/UserAPI";
 import { IError, IUserCompanyDetail } from "@/types/interface";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import UserTableSkeleton from "../skeletons/UserTableSkeleton";
+import { DeleteUser } from "../delete-component/deleteUser";
 
 const UserList = ({
   token,
@@ -23,7 +24,6 @@ const UserList = ({
 }) => {
   const [dataUsers, setDataUsers] = useState<IUserCompanyDetail[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<IError | null>(null);
 
   useEffect(() => {
@@ -60,31 +60,11 @@ const UserList = ({
     };
   }, [statusAuth, token]);
 
-  const handleDelete = async (userId: number) => {
-    setIsLoading(false);
-    setError(null);
-    setSuccess("");
-    try {
-      await fetchDeleteUser(userId, token);
-      const data = await fetchAllUserCompany(token);
-      setDataUsers(data);
-      setSuccess("Berhasil Hapus User");
-    } catch (err) {
-      setError({
-        message: err instanceof Error ? err.message : "Unknown error occured",
-        name: err instanceof Error ? err.name : undefined,
-        code: err instanceof Error ? 500 : undefined,
-      });
-    } 
-  };
-
   // set alert for success and error
   useEffect(() => {
     if (error) {
       toast.error(error.message);
-    } else if (success) {
-      toast.success(success);
-    }
+    } 
   })
 
   return (
@@ -123,16 +103,8 @@ const UserList = ({
                   <Link href={`./users/update/${user.user_company_id}`}>
                     <SquarePen />
                   </Link>
-                  <div>
-                    <button
-                      onClick={() => {
-                        if (confirm("Yakin untuk hapus user ini?")) {
-                          handleDelete(user.user_id);
-                        }
-                      }}
-                    >
-                      <Delete className="text-red-500" />
-                    </button>
+                  <div className="text-red-400">
+                    <DeleteUser token={token} userId={user.user_id}/>
                   </div>
                 </TableCell>
               </TableRow>

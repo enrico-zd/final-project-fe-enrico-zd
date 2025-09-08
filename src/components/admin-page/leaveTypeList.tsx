@@ -8,17 +8,19 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Delete, SquarePen } from "lucide-react";
-import { fetchDeleteLeaveType, fetchLeaveType } from "@/services/LeaveTypeApi";
+import { SquarePen } from "lucide-react";
+import { fetchLeaveType } from "@/services/LeaveTypeApi";
 import { useSession } from "next-auth/react";
 import { IError, ILeaveType } from "@/types/interface";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import LeaveTypeTableSkeleton from "../skeletons/LeaveTypeTableSkeleton";
+import { DeleteLeaveType } from "../delete-component/deleteLeaveType";
 
 const LeaveTypeList = () => {
   const { data: session, status } = useSession();
   const [dataType, setDataType] = useState<ILeaveType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<IError | null>(null);
 
   useEffect(() => {
@@ -55,35 +57,19 @@ const LeaveTypeList = () => {
     };
   }, [status, session?.user.accessToken]);
 
-  const handleDelete = async (leaveTypeId: number) => {
-    setIsLoading(false);
-    setError(null);
-    setSuccess("");
-    try {
-      await fetchDeleteLeaveType(leaveTypeId, session?.user.accessToken);
-      const data = await fetchLeaveType(session?.user.accessToken);
-      setDataType(data);
-      setSuccess("Berhasil Hapus User");
-    } catch (err) {
-      setError({
-        message: err instanceof Error ? err.message : "Unknown error occured",
-        name: err instanceof Error ? err.name : undefined,
-        code: err instanceof Error ? 500 : undefined,
-      });
-    } finally {
-      setTimeout(() => {
-        setSuccess("");
-      }, 1000);
+  // set alert error
+  useEffect(() => {
+    if (error) {
+      toast.error(error.message);
     }
-  };
+  })
 
   return (
     <div>
-      {success && <h1>{success}</h1>}
-      {error && <h1>{error.message}</h1>}
       {isLoading ? (
-        <h1>Loading...</h1>
+        <LeaveTypeTableSkeleton />
       ) : (
+
         <Table className="[&_th]:text-center [&_th]:text-white text-center rounded-xl overflow-hidden">
           <TableHeader className="bg-amber-400">
             <TableRow>
@@ -112,15 +98,7 @@ const LeaveTypeList = () => {
                     </Link>
                   </div>
                   <div className="text-red-400">
-                    <button
-                      onClick={() => {
-                        if (confirm("Yakin untuk hapus leave type ini?")) {
-                          handleDelete(leaveType.leave_type_id);
-                        }
-                      }}
-                    >
-                      <Delete />
-                    </button>
+                    <DeleteLeaveType token={session?.user.accessToken} leaveId={leaveType.leave_type_id}/>
                   </div>
                 </TableCell>
               </TableRow>

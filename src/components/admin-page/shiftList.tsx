@@ -10,12 +10,13 @@ import {
   TableRow,
 } from "../ui/table";
 import { IError, IShift } from "@/types/interface";
-import { fetchDeleteShift, fetchShift } from "@/services/ShiftAPI";
+import { fetchShift } from "@/services/ShiftAPI";
 import Link from "next/link";
-import { Delete, SquarePen } from "lucide-react";
+import { SquarePen } from "lucide-react";
 import { TimeFormat } from "@/lib/timeFormating";
 import { toast } from "sonner";
 import ShiftTableSkeleton from "../skeletons/ShiftTableSkeleton";
+import { DeleteShift } from "../delete-component/deleteShift";
 const ShiftList = ({
   token,
   statusAuth,
@@ -25,7 +26,6 @@ const ShiftList = ({
 }) => {
   const [shiftData, setShiftData] = useState<IShift[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [success, setSuccess] = useState<string>("");
   const [error, setError] = useState<IError | null>(null);
 
   useEffect(() => {
@@ -62,34 +62,10 @@ const ShiftList = ({
     };
   }, [statusAuth, token]);
 
-  const handleDelete = async (shiftId: number) => {
-    setIsLoading(false);
-    setError(null);
-    setSuccess("");
-    try {
-      await fetchDeleteShift(shiftId, token);
-      const shift = await fetchShift(token);
-      setShiftData(shift);
-      setSuccess("Berhasil Hapus Shift");
-    } catch (err) {
-      setError({
-        message: err instanceof Error ? err.message : "Unknown error occured",
-        name: err instanceof Error ? err.name : undefined,
-        code: err instanceof Error ? 500 : undefined,
-      });
-    } finally {
-      setTimeout(() => {
-        setSuccess("");
-      }, 1000);
-    }
-  };
-
   // set alert for success and error
   useEffect(() => {
     if (error) {
       toast.error(error.message);
-    } else if (success) {
-      toast.success(success);
     }
   });
 
@@ -123,16 +99,8 @@ const ShiftList = ({
                       <SquarePen />
                     </Link>
                   </div>
-                  <div>
-                    <button
-                      onClick={() => {
-                        if (confirm("Yakin untuk hapus shift ini?")) {
-                          handleDelete(shift.shift_id);
-                        }
-                      }}
-                    >
-                      <Delete className="text-red-500" />
-                    </button>
+                  <div className="text-red-400">
+                    <DeleteShift token={token} shiftId={shift.shift_id}/>
                   </div>
                 </TableCell>
               </TableRow>
